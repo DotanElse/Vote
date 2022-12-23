@@ -29,13 +29,25 @@ def process_login_form():
 
 @app.route('/process_user_register', methods=['POST'])
 def process_register_form():
-  name = request.form['name']
-  email = request.form['email']
-  password = request.form['password']
-  birthday = request.form['birthday']
-  # TODO add hashing of password 
-  query.submit_user(email, password, name, birthday)
-  return render_template('index.html')
+    name = request.form['name']
+    email = request.form['email']
+    password = request.form['password']
+    birthday = request.form['birthday']
+    # TODO add hashing of password 
+    if query.submit_user(email, password, name, birthday):
+        return render_template('index.html')
+    return render_template('error.html') # eventually change to popup at main site (additional param to main_page)
+
+@app.route('process_pool_creation', methods=['POST'])
+def process_pool_creation():
+    creator = request.form.get('creator')
+    title = request.form.get('title')
+    group = request.form.get('group')
+    description = request.form.get('description')
+    optionNames = request.form.get('optionNames')
+    optionValues = request.form.get('optionValues')
+    if query.submit_pool(creator, title, group, description, optionNames, optionValues):
+        return render_template('index.html')
 
 
 if __name__ == '__main__':

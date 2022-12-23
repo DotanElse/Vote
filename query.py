@@ -1,5 +1,6 @@
 import sqlite3
 from flask import Flask, render_template
+from utils import get_random_pool_id
 
 def get_user(email, password):
     users_conn = sqlite3.connect('users.db')
@@ -29,6 +30,34 @@ def submit_user(email, password, name, date):
             )
             """)
             # add the user, all users are in the "0" group, which is THE WORLD
+            c.execute("INSERT INTO users VALUES (:email, :hashed_password, :name, :birthday, :groups)",
+            {'email': email, 'hashed_password': password, 'name': name, 'birthday': date, 'groups': "0"})
+            return True
+    except:
+        return False
+
+def submit_pool(creator, title, group, description, optionNames, optionValues):
+    polls_conn = sqlite3.connect('polls.db')
+    id = get_random_pool_id() # stretch - check if exists already
+    #TODO 1 - add time param and check this function throughly again, afterwards add logging
+    try:
+        with polls_conn:
+            c = polls_conn.cursor()
+            # maybe go for init function
+            c.execute("""
+            CREATE TABLE IF NOT EXISTS polls 
+            (
+                id TEXT UNIQUE NOT NULL
+                start_time TEXT NOT NULL
+                creator TEXT NOT NULL,
+                title TEXT NOT NULL,
+                group INTEGER NOT NULL,
+                description TEXT,
+                optionNames TEXT NOT NULL,
+                optionValues TEXT,
+            )
+            """)
+            # add the poll
             c.execute("INSERT INTO users VALUES (:email, :hashed_password, :name, :birthday, :groups)",
             {'email': email, 'hashed_password': password, 'name': name, 'birthday': date, 'groups': "0"})
             return True
