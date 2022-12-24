@@ -6,5 +6,16 @@
     <div class="title_container">
       <h2>Attributes and main feed of site</h2>
     </div>
+    <form id="pool-form" action="/process_pool_creation" method="post">
+      <label for="name">Title:</label><br>
+      <input type="text" id="title" name="title" required><br>
+      <label for="group">Group:</label><br>
+      <input type="text" id="group" name="group" required><br>
+      <label for="description">Description:</label><br>
+      <input type="text" id="description" name="description"><br>
+      <label for="optionNames">Options:</label><br>
+      <input type="text" id="optionNames" name="optionNames" required><br><br>
+      <input type="submit" value="Submit">
+    </form>
   </body>
 </html>

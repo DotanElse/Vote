@@ -1,7 +1,11 @@
+import logging
+
 from flask import Flask, render_template, request
 
 from utils import USER_FIELD, POOL_FIELD
 import query
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
 app = Flask(__name__)
 
@@ -22,7 +26,7 @@ def process_login_form():
     email = request.form['email']
     password = request.form['password']
     # TODO add check of hashing password
-    if not query.get_user(email, password):
+    if not query.authorize_user(email, password):
         return render_template("failed_login.html")
     return query.show_main_page(email)
     # should be (return show_main_page(email)), using diff for creating db and testing creation of poll
@@ -38,7 +42,7 @@ def process_register_form():
         return render_template('index.html')
     return render_template('error.html') # eventually change to popup at main site (additional param to main_page)
 
-@app.route('process_pool_creation', methods=['POST'])
+@app.route('/process_pool_creation', methods=['POST'])
 def process_pool_creation():
     creator = request.form.get('creator')
     title = request.form.get('title')
@@ -48,7 +52,9 @@ def process_pool_creation():
     optionValues = request.form.get('optionValues')
     if query.submit_pool(creator, title, group, description, optionNames, optionValues):
         return render_template('index.html')
+    return render_template('error.html')
 
 
 if __name__ == '__main__':
+    logging.info("Server startup")
     app.run(debug=True, host='0.0.0.0')

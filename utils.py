@@ -2,6 +2,9 @@
 import random
 import time
 import string
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
 _POOL_ID_LEN = 11
 
@@ -26,3 +29,9 @@ POOL_FIELD = {
 def get_random_pool_id():
     characters = string.ascii_lowercase + string.digits
     return "".join(random.choices(characters, k=_POOL_ID_LEN))
+    
+def str_to_list(input):
+    # Split the input string on commas
+    items = input.split(',')
+    # Strip leading and trailing whitespace from each item
+    return [item.strip() for item in items]
