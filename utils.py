@@ -80,18 +80,15 @@ def init_db():
                 start_time INTEGER NOT NULL,
                 creator TEXT NOT NULL,
                 title TEXT NOT NULL,
+                yosi TEXT NOT NULL,
                 description TEXT,
                 optionNames TEXT NOT NULL,
                 optionValues TEXT
             )
-            """)
+            """) #TODO - refactor "group" variable (currently yosi and working)
             logging.info("pool table created")
-            # c.execute(
-            # "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, optionNames, optionValues)",
-            # {'id': id, 'start_time': 1, 'creator': "2", 'title': "3", 'group': "4", 
-            # 'description': "5", 'optionNames': "6", 'optionValues': "8"}
-            # )
-    except:
+    except sqlite3.Error as error:
+        print(error)
         return False
     logging.info("DB initialized")
     return True

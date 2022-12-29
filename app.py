@@ -49,13 +49,18 @@ def process_pool_creation():
     group = request.form.get('group')
     description = request.form.get('description')
     optionNames = request.form.get('optionNames')
-    optionValues = request.form.get('optionValues')
-    if query.submit_pool(creator, title, group, description, optionNames, optionValues):
+    if query.submit_pool(creator, title, group, description, optionNames):
         return render_template('index.html')
     return render_template('error.html')
 
+def temp():
+    """Testing tool"""
+    query.get_pools_by_groups()
 
 if __name__ == '__main__':
+    #print(query.submit_pool("creator", "title", "0", "desc", "yosi, bani"))
+    #a = temp()
+    #b = 1
     logging.info("Server startup")
     assert init_db() == True
     app.run(debug=True, host='0.0.0.0')

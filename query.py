@@ -47,37 +47,22 @@ def submit_user(email, password, name, date):
     except:
         return False
 
-def submit_pool(creator, title, group, description, optionNames, optionValues):
+def submit_pool(creator, title, group, description, optionNames):
     polls_conn = sqlite3.connect('polls.db')
     id = get_random_pool_id() # stretch - check if same id exists already
     start_time = int(time.time())
     try:
         with polls_conn:
             c = polls_conn.cursor()
-            # maybe go for init function
-            c.execute("""
-            CREATE TABLE IF NOT EXISTS polls
-            (
-                id TEXT UNIQUE NOT NULL
-                start_time INTEGER NOT NULL
-                creator TEXT NOT NULL,
-                title TEXT NOT NULL,
-                group INTEGER NOT NULL,
-                description TEXT,
-                optionNames TEXT NOT NULL,
-                optionValues TEXT,
-            )
-            """)
             # add the poll
             c.execute(
             "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, optionNames, optionValues)",
             {'id': id, 'start_time': start_time, 'creator': creator, 'title': title, 'group': group, 
-            'description': description, 'optionNames': optionNames, 'optionValues': optionValues}
+            'description': description, 'optionNames': optionNames, 'optionValues': '0...0'}
             )
             return True
     except:
         return False
-
 
 def show_main_page(email):
     user = get_user(email)
@@ -94,8 +79,20 @@ def show_main_page(email):
     polls = []
     with polls_conn:
         c = polls_conn.cursor()
+        logging.info(f"query to run is '{query}' and groups are {group_field}")
         c.execute(query, group_field) # TODO start here, not working cause i think pool db dont have tables yet
         polls = c.fetchall()
     #TODO return list of tuples, enum with the utils POLL_FIELD
     return render_template("main_page.html", email, polls)
     #TODO - create that database and function to add votes to it
+
+def get_pools_by_groups():
+    q = """SELECT * FROM polls WHERE group IN (?);"""
+    params = '0'
+    polls_conn = sqlite3.connect('polls.db')
+    polls = ""
+    with polls_conn:
+        c = polls_conn.cursor()
+        c.execute(q, params)
+        polls = c.fetchall()
+    return polls
