@@ -56,7 +56,7 @@ def submit_pool(creator, title, group, description, optionNames, optionValues):
             c = polls_conn.cursor()
             # maybe go for init function
             c.execute("""
-            CREATE TABLE IF NOT EXISTS polls 
+            CREATE TABLE IF NOT EXISTS polls
             (
                 id TEXT UNIQUE NOT NULL
                 start_time INTEGER NOT NULL
@@ -72,7 +72,7 @@ def submit_pool(creator, title, group, description, optionNames, optionValues):
             c.execute(
             "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, optionNames, optionValues)",
             {'id': id, 'start_time': start_time, 'creator': creator, 'title': title, 'group': group, 
-            'description': description, 'optionNames': optionNames, optionValues: optionValues}
+            'description': description, 'optionNames': optionNames, 'optionValues': optionValues}
             )
             return True
     except:

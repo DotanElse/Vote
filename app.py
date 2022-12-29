@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, render_template, request
 
-from utils import USER_FIELD, POOL_FIELD
+from utils import USER_FIELD, POOL_FIELD, init_db
 import query
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
@@ -57,4 +57,5 @@ def process_pool_creation():
 
 if __name__ == '__main__':
     logging.info("Server startup")
+    assert init_db() == True
     app.run(debug=True, host='0.0.0.0')
