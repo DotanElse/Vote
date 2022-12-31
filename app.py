@@ -58,7 +58,7 @@ def temp():
     query.get_pools_by_groups()
 
 if __name__ == '__main__':
-    #print(query.submit_pool("creator", "title", "0", "desc", "yosi, bani"))
+    print(query.submit_pool("creator", "title", "0", "desc", "yosi, bani"))
     #a = temp()
     #b = 1
     logging.info("Server startup")

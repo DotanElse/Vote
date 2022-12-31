@@ -56,13 +56,14 @@ def submit_pool(creator, title, group, description, optionNames):
             c = polls_conn.cursor()
             # add the poll
             c.execute(
-            "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, optionNames, optionValues)",
+            "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, :optionNames, :optionValues)",
             {'id': id, 'start_time': start_time, 'creator': creator, 'title': title, 'group': group, 
             'description': description, 'optionNames': optionNames, 'optionValues': '0...0'}
             )
             return True
-    except:
-        return False
+    except sqlite3.Error as error:
+        print(error)
+    return False
 
 def show_main_page(email):
     user = get_user(email)
