@@ -2,7 +2,7 @@ import logging
 
 from flask import Flask, render_template, request
 
-from utils import USER_FIELD, POOL_FIELD, init_db
+import utils
 import query
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
@@ -58,9 +58,10 @@ def temp():
     query.get_pools_by_groups()
 
 if __name__ == '__main__':
-    print(query.submit_pool("creator", "title", "0", "desc", "yosi, bani"))
+    #print(query.submit_pool("creator", "title", "0", "desc", "yosi, bani"))
+    query.show_main_page("dotanelse@gmail.com")
     #a = temp()
     #b = 1
     logging.info("Server startup")
-    assert init_db() == True
+    assert utils.init_db() == True
     app.run(debug=True, host='0.0.0.0')

@@ -4,6 +4,9 @@ import time
 import string
 import logging
 import sqlite3
+import query
+
+from flask import render_template
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -92,3 +95,25 @@ def init_db():
         return False
     logging.info("DB initialized")
     return True
+
+def show_main_page(email):
+    user = query.get_user(email)
+    logging.info(f"user is {user}")
+    name_field = user[USER_FIELD["name"]]
+    logging.info(f"user '{name_field}' selected for main page")
+    group_field = str_to_list(user[USER_FIELD["groups"]])
+    logging.info(f"user '{name_field}' has '{group_field}' groups")
+    # Build the query string for getting all polls related to specific user
+    placeholders = ', '.join(['?'] * len(group_field))
+    query = f"SELECT * FROM polls WHERE group_ IN ({placeholders});"
+    logging.info(f"query is '{query}'")
+    polls_conn = sqlite3.connect('polls.db')
+    polls = []
+    with polls_conn:
+        c = polls_conn.cursor()
+        logging.info(f"query to run is '{query}' and groups are {group_field}")
+        c.execute(query, group_field) # TODO start here, not working cause i think pool db dont have tables yet
+        polls = c.fetchall()
+    #TODO return list of tuples, enum with the utils POLL_FIELD
+    return render_template("main_page.html", email, polls)
+    #TODO - create that database and function to add votes to it
