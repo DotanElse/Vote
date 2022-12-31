@@ -21,7 +21,7 @@ POOL_FIELD = {
     "start_time": 1,
     "creator": 2,
     "title": 3,
-    "group": 4,
+    "group_": 4,
     "description": 5,
     "optionNames": 6,
     "optionValues": 7,
@@ -67,7 +67,7 @@ def init_db():
             #     start_time INTEGER NOT NULL,
             #     creator TEXT NOT NULL,
             #     title TEXT NOT NULL,
-            #     group INTEGER NOT NULL,
+            #     group_ INTEGER NOT NULL,
             #     description TEXT,
             #     optionNames TEXT NOT NULL,
             #     optionValues TEXT
@@ -80,12 +80,12 @@ def init_db():
                 start_time INTEGER NOT NULL,
                 creator TEXT NOT NULL,
                 title TEXT NOT NULL,
-                yosi TEXT NOT NULL,
+                group_ TEXT NOT NULL,
                 description TEXT,
                 optionNames TEXT NOT NULL,
                 optionValues TEXT
             )
-            """) #TODO - refactor "group" variable (currently yosi and working)
+            """) #group variable refactored into "group_" as group is a keyword in db
             logging.info("pool table created")
     except sqlite3.Error as error:
         print(error)

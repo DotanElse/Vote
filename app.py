@@ -46,7 +46,7 @@ def process_register_form():
 def process_pool_creation():
     creator = request.form.get('creator')
     title = request.form.get('title')
-    group = request.form.get('group')
+    group = request.form.get('group_')
     description = request.form.get('description')
     optionNames = request.form.get('optionNames')
     if query.submit_pool(creator, title, group, description, optionNames):

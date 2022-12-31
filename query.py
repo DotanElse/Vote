@@ -73,7 +73,7 @@ def show_main_page(email):
     logging.info(f"user '{name_field}' has '{group_field}' groups")
     # Build the query string for getting all polls related to specific user
     placeholders = ', '.join(['?'] * len(group_field))
-    query = f"SELECT * FROM polls WHERE group IN ({placeholders});"
+    query = f"SELECT * FROM polls WHERE group_ IN ({placeholders});"
     logging.info(f"query is '{query}'")
     polls_conn = sqlite3.connect('polls.db')
     polls = []
@@ -87,7 +87,7 @@ def show_main_page(email):
     #TODO - create that database and function to add votes to it
 
 def get_pools_by_groups():
-    q = """SELECT * FROM polls WHERE group IN (?);"""
+    q = """SELECT * FROM polls WHERE group_ IN (?);"""
     params = '0'
     polls_conn = sqlite3.connect('polls.db')
     polls = ""
