@@ -58,10 +58,10 @@ def temp():
     query.get_pools_by_groups()
 
 if __name__ == '__main__':
-    #print(query.submit_pool("creator", "title", "0", "desc", "yosi, bani"))
-    query.show_main_page("dotanelse@gmail.com")
+    #print(query.submit_pool("creator", "title", "1", "desc", "asdf, bani"))
     #a = temp()
     #b = 1
+    #query.show_main_page("dotanelse@gmail.com")
     logging.info("Server startup")
-    assert utils.init_db() == True
+    assert query.init_db() == True
     app.run(debug=True, host='0.0.0.0')
