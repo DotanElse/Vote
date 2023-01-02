@@ -1,3 +1,4 @@
+import json
 import sqlite3
 import time
 import logging
@@ -124,7 +125,7 @@ def init_db():
 
 def show_main_page(email):
     user = get_user(email)
-    logging.info(f"user is {user}")
+    logging.info(f"user is {user})")
     name_field = user[USER_FIELD["name"]]
     logging.info(f"user '{name_field}' selected for main page")
     group_field = str_to_list(user[USER_FIELD["groups"]])
@@ -142,7 +143,7 @@ def show_main_page(email):
         polls = c.fetchall()
     #TODO return list of tuples, enum with the utils POLL_FIELD
     print(f"email is {email} and polls are {polls}")
-    return render_template("main_page.html", email=email, polls=polls)
+    return render_template("main_page.html", user=user, polls=polls)
     #TODO - create that database and function to add votes to it
 
 def pick_pool_option(email, pool_id, optionNumber):

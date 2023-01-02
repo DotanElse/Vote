@@ -1,17 +1,20 @@
   <head>
     <meta charset="utf-8">
     <title>Vote</title>
+    <script src="../static/main_page.js" defer></script>
   </head>
   <body>
     <div class="title_container">
       <h2>Attributes and main feed of site</h2>
     </div>
-    <div>{{ email }}</div>
-    <form id="pool-form" action="/process_pool_creation" method="post">
+    <div>{{ user }}</div>
+    <div>{{ polls }}</div> <!-- #TODO - make it pretty -->
+    <form id="pool-form" action="/process_pool_creation" method="post"> <!-- #TODO - appear on button and form popup -->
       <label for="name">Title:</label><br>
       <input type="text" id="title" name="title" required><br>
       <label for="group">Group:</label><br>
-      <input type="text" id="group" name="group_" required><br>
+      <select name="group_" id="group" required></select><br>
+      <!-- <input type="text" id="group" name="group_" required><br> -->
       <label for="description">Description:</label><br>
       <input type="text" id="description" name="description"><br>
       <input type="hidden" name="creator" value="{{ email }}">
@@ -20,8 +23,9 @@
       <input type="submit" value="Submit">
     </form>
   </body>
-  <script>
-    var email = '{{ email }}';
-    console.log(email);
-</script>
+  <script type="text/javascript" {{ url_for('static', filename='main_page.js')}}></script>
+  <script type="text/javascript">
+    user = '{{user|tojson}}'
+    console.log(typeof(user))
+  </script>
 </html>
