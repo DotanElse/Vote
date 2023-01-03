@@ -3,9 +3,8 @@ group_dropdown(user)
 
 function group_dropdown(user)
 {
-    var choices = user;
-    console.log(typeof(choices)) // TODO find out how to return a list/tuple, maybe check polls
-    console.log(user)
+    var choices = user[4];
+    choices = choices.split(",");
 
     // get the select element
     var select = document.getElementById('group');
