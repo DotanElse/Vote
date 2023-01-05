@@ -123,7 +123,7 @@ def init_db():
     logging.info("DB initialized")
     return True
 
-def show_main_page(email):
+def get_user_and_polls(email):
     user = get_user(email)
     logging.info(f"user is {user})")
     name_field = user[USER_FIELD["name"]]
@@ -139,12 +139,9 @@ def show_main_page(email):
     with polls_conn:
         c = polls_conn.cursor()
         logging.info(f"query to run is '{query}' and groups are {group_field}")
-        c.execute(query, group_field) # TODO start here, not working cause i think pool db dont have tables yet
+        c.execute(query, group_field)
         polls = c.fetchall()
-    #TODO return list of tuples, enum with the utils POLL_FIELD
-    print(f"email is {email} and polls are {polls}")
-    return render_template("main_page.html", user=user, polls=polls)
-    #TODO - create that database and function to add votes to it
+    return user, polls
 
 def pick_pool_option(email, pool_id, optionNumber):
     #get user entry

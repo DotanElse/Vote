@@ -2,6 +2,7 @@
 import random
 import string
 import logging
+from flask_jwt_extended import create_access_token
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -37,3 +38,17 @@ def str_to_list(input):
 
 def list_to_str(input):
     return ', '.join(input)
+
+def get_access_token(user):
+    user_email = user[USER_FIELD['email']]
+    user_name = user[USER_FIELD['name']]
+    user_groups = user[USER_FIELD['groups']]
+    user_birthday = user[USER_FIELD['birthday']]
+
+    # Set the user's ID, name, and email as the identity in the JWT
+    return create_access_token(identity={
+        'email': user_email,
+        'name': user_name,
+        'groups': user_groups,
+        'birthday': user_birthday
+    })
