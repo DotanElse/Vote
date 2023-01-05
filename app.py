@@ -1,5 +1,11 @@
+import logging
+
 from flask import Flask, render_template, request
-import sqlite3
+
+import utils
+import query
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
 app = Flask(__name__)
 
@@ -15,51 +21,47 @@ def register():
 def login():
     return render_template('login.html')
 
-def submit_user(email, password, name, date):
-    conn = sqlite3.connect('users.db')
-    with conn:
-        c = conn.cursor()
-        # create the db if does not exist, maybe move to different function
-        c.execute("""
-        CREATE TABLE IF NOT EXISTS users 
-        (
-            email TEXT UNIQUE NOT NULL,
-            hashed_password TEXT NOT NULL,
-            name TEXT NOT NULL,
-            birthday TEXT NOT NULL
-        )
-        """)
-        # add the user
-        c.execute("INSERT INTO users VALUES (:email, :hashed_password, :name, :birthday)",
-        {'email': email, 'hashed_password': password, 'name': name, 'birthday': date})
-
-def get_user(email, password):
-    conn = sqlite3.connect('users.db')
-    with conn:
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE email=? AND hashed_password=?", (email, password))
-        return c.fetchall()
-
 @app.route('/process_user_login', methods=['POST'])
 def process_login_form():
     email = request.form['email']
     password = request.form['password']
     # TODO add check of hashing password
-    if get_user(email, password):
-        return render_template("main_page.html")
-    return render_template("failed_login.html")
+    if not query.authorize_user(email, password):
+        return render_template("failed_login.html")
+    return query.show_main_page(email)
+    # should be (return show_main_page(email)), using diff for creating db and testing creation of poll
 
 @app.route('/process_user_register', methods=['POST'])
 def process_register_form():
-  name = request.form['name']
-  email = request.form['email']
-  password = request.form['password']
-  birthday = request.form['birthday']
-  # TODO add hashing of password 
-  submit_user(email, password, name, birthday)
-  return render_template('index.html')
+    name = request.form['name']
+    email = request.form['email']
+    password = request.form['password']
+    birthday = request.form['birthday']
+    # TODO add hashing of password 
+    if query.submit_user(email, password, name, birthday):
+        return render_template('index.html')
+    return render_template('error.html') # eventually change to popup at main site (additional param to main_page)
+
+@app.route('/process_pool_creation', methods=['POST'])
+def process_pool_creation():
+    creator = request.form.get('creator')
+    title = request.form.get('title')
+    group = request.form.get('group_')
+    description = request.form.get('description')
+    optionNames = request.form.get('optionNames')
+    if query.submit_pool(creator, title, group, description, optionNames):
+        return render_template('index.html')
+    return render_template('error.html')
+
+def temp():
+    """Testing tool"""
+    query.get_pools_by_groups()
 
 if __name__ == '__main__':
+    #print(query.submit_pool("creator", "title", "1", "desc", "asdf, bani"))
+    #a = temp()
+    #b = 1
+    #query.show_main_page("dotanelse@gmail.com")
+    logging.info("Server startup")
+    assert query.init_db() == True
     app.run(debug=True, host='0.0.0.0')
-    print("a")
-        
