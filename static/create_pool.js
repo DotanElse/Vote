@@ -1,4 +1,4 @@
-console.log("-Create pool-")
+console.log("-Create poll-")
 group_dropdown(groups)
 
 function group_dropdown(groups)

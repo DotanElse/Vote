@@ -33,7 +33,7 @@ def login():
 @jwt_required
 @app.route('/create_poll')
 def create_poll():
-    logging.info("Create pool view")
+    logging.info("Create poll view")
     token = request.cookies.get('access_token_cookie')
     print(f"token is {token}")
     verify_jwt_in_request()
@@ -66,23 +66,27 @@ def process_register_form():
         return render_template('index.html')
     return render_template('error.html') # eventually change to popup at main site (additional param to main_page)
 
-@app.route('/process_pool_creation', methods=['POST'])
-def process_pool_creation():
+@app.route('/process_poll_creation', methods=['POST'])
+def process_poll_creation():
     creator = request.form.get('creator')
     title = request.form.get('title')
     group = request.form.get('group_')
     description = request.form.get('description')
     optionNames = request.form.get('optionNames')
-    if query.submit_pool(creator, title, group, description, optionNames):
+    if query.submit_poll(creator, title, group, description, optionNames):
         return render_template('index.html')
     return render_template('error.html')
 
+@app.route('/process_poll_vote/<id>', methods=['POST'])
+def poll_vote(id):
+    print(query.get_poll(id))
+
 def temp():
     """Testing tool"""
-    query.get_pools_by_groups()
+    query.get_polls_by_groups()
 
 if __name__ == '__main__':
-    #print(query.submit_pool("creator", "title", "1", "desc", "asdf, bani"))
+    #print(query.submit_poll("creator", "title", "1", "desc", "asdf, bani"))
     #a = temp()
     #b = 1
     logging.info("Server startup")

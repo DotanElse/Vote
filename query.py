@@ -3,7 +3,7 @@ import sqlite3
 import time
 import logging
 from flask import Flask, render_template
-from utils import get_random_pool_id, USER_FIELD, POOL_FIELD, str_to_list 
+from utils import get_random_poll_id, USER_FIELD, poll_FIELD, str_to_list 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -24,6 +24,14 @@ def get_user(email):
 def get_user_polls(email):
     """"returns all polls"""
     pass
+
+def get_poll(id):
+    polls_conn = sqlite3.connect('polls.db')
+    with polls_conn:
+        c = polls_conn.cursor()
+        c.execute(f"SELECT * FROM polls WHERE id IN ({id});")
+        return c.fetchone()
+    return False
 
 def submit_user(email, password, name, date):
     users_conn = sqlite3.connect('users.db')
@@ -48,9 +56,9 @@ def submit_user(email, password, name, date):
     except:
         return False
 
-def submit_pool(creator, title, group, description, optionNames):
+def submit_poll(creator, title, group, description, optionNames):
     polls_conn = sqlite3.connect('polls.db')
-    id = get_random_pool_id() # stretch - check if same id exists already
+    id = get_random_poll_id() # stretch - check if same id exists already
     start_time = int(time.time())
     optionAmount = len(str_to_list(optionNames))
     optionValues = ','.join(['0'] * optionAmount)
@@ -70,7 +78,7 @@ def submit_pool(creator, title, group, description, optionNames):
         print(error)
     return False
 
-def get_pools_by_groups():
+def get_polls_by_groups():
     q = """SELECT * FROM polls WHERE group_ IN (?);"""
     params = '0'
     polls_conn = sqlite3.connect('polls.db')
@@ -116,7 +124,7 @@ def init_db():
                 optionValues TEXT
             )
             """) #group variable refactored into "group_" as group is a keyword in db
-            logging.info("pool table created")
+            logging.info("poll table created")
     except sqlite3.Error as error:
         print(error)
         return False
@@ -143,13 +151,13 @@ def get_user_and_polls(email):
         polls = c.fetchall()
     return user, polls
 
-def pick_pool_option(email, pool_id, optionNumber):
+def pick_poll_option(email, poll_id, optionNumber):
     #get user entry
-    #get pool entry
-    #check if user voted to that pool
-    #assert pool has no more options then optionNumber
-    #get optionValues string from the pool, change it to list
+    #get poll entry
+    #check if user voted to that poll
+    #assert poll has no more options then optionNumber
+    #get optionValues string from the poll, change it to list
     #optionValues[optionNumber]++
-    #set it back to string and change the specific pool back
+    #set it back to string and change the specific poll back
     #log this "user x voted y"
     pass
