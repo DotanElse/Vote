@@ -149,6 +149,7 @@ def get_user_and_polls(email):
         logging.info(f"query to run is '{query}' and groups are {group_field}")
         c.execute(query, group_field)
         polls = c.fetchall()
+        logging.info(f"queries selected '{polls}'")
     return user, polls
 
 def pick_poll_option(email, poll_id, optionNumber):

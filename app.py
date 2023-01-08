@@ -68,11 +68,12 @@ def process_register_form():
 
 @app.route('/process_poll_creation', methods=['POST'])
 def process_poll_creation():
-    creator = request.form.get('creator')
-    title = request.form.get('title')
-    group = request.form.get('group_')
-    description = request.form.get('description')
-    optionNames = request.form.get('optionNames')
+    creator = request.form.get('creator').strip()
+    title = request.form.get('title').strip()
+    group = request.form.get('group_').strip()
+    description = request.form.get('description').strip()
+    optionNames = request.form.get('optionNames').strip()
+    logging.info(f"asdf: '{group}' '{title}' '{creator}' '{description}'")
     if query.submit_poll(creator, title, group, description, optionNames):
         return render_template('index.html')
     return render_template('error.html')
