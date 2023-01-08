@@ -5,7 +5,7 @@ function poll_view(polls)
 {
     console.log(polls)
     // get the select element
-    var select = document.getElementById('form_container');
+    var select = document.getElementById('form_wrapper');
   
     // create forms
     for (var i = 0; i < polls.length; i++) 
@@ -32,7 +32,7 @@ function poll_view(polls)
         for (const option of poll_options) 
         {
             const optionElement = document.createElement("div");
-            optionElement.classList.add("option");
+            optionElement.classList.add("option"); 
         
             const optionDescriptionElement = document.createElement("p");
             optionDescriptionElement.classList.add("option-description");
@@ -42,10 +42,13 @@ function poll_view(polls)
             const radioElement = document.createElement("input");
             radioElement.type = "radio";
             radioElement.name = "radar-option";
-            radioElement.value = option.value;
+            radioElement.value = `${poll_id}${option}`;
+            radioElement.id = `${poll_id}${option}`;
+            console.log(`yo, option is: ${radioElement.id}`);
             optionElement.appendChild(radioElement);
         
             const labelElement = document.createElement("label");
+            labelElement.htmlFor = `${poll_id}${option}`;
             optionElement.appendChild(labelElement);
         
             formElement.appendChild(optionElement);

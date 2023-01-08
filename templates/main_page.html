@@ -1,6 +1,6 @@
   <head>
     <meta charset="utf-8">
-    <title>Vote</title>
+    <title>Home</title>
     <script src="../static/main_page.js" defer></script>
     <style>
       .radar-form {
@@ -73,7 +73,7 @@
     </div>
     <a href="{{url_for('create_poll')}}"><button id="create_poll_button">Create New Form</button></a>
     <div>{{ polls }}</div> <!-- #TODO - make it pretty -->
-    <div id="form_container"></div>
+    <div id="form_wrapper"></div>
   </body>
   <script type="text/javascript">
     user = JSON.parse('{{user|tojson|safe}}')
