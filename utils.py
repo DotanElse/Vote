@@ -15,7 +15,7 @@ USER_FIELD = {
     "birthday": 3,
     "groups": 4,
 }
-poll_FIELD = {
+POLL_FIELD = {
     "id": 0,
     "start_time": 1,
     "creator": 2,
@@ -24,6 +24,9 @@ poll_FIELD = {
     "description": 5,
     "optionNames": 6,
     "optionValues": 7,
+    "idVoted": 8,
+    "duration": 9,
+    "public": 10,
 }
 
 def get_random_poll_id():

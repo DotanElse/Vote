@@ -73,8 +73,9 @@ def process_poll_creation():
     group = request.form.get('group_').strip()
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
-    logging.info(f"asdf: '{group}' '{title}' '{creator}' '{description}'")
-    if query.submit_poll(creator, title, group, description, optionNames):
+    public = request.form.get('public').strip()
+    duration = request.form.get('duration').strip()
+    if query.submit_poll(creator, title, group, description, optionNames, duration, public):
         return render_template('index.html')
     return render_template('error.html')
 

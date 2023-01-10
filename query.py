@@ -3,7 +3,7 @@ import sqlite3
 import time
 import logging
 from flask import Flask, render_template
-from utils import get_random_poll_id, USER_FIELD, poll_FIELD, str_to_list 
+from utils import get_random_poll_id, USER_FIELD, POLL_FIELD, str_to_list 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -56,22 +56,24 @@ def submit_user(email, password, name, date):
     except:
         return False
 
-def submit_poll(creator, title, group, description, optionNames):
+def submit_poll(creator, title, group, description, optionNames, duration, public):
     polls_conn = sqlite3.connect('polls.db')
     id = get_random_poll_id() # stretch - check if same id exists already
     start_time = int(time.time())
     optionAmount = len(str_to_list(optionNames))
     optionValues = ','.join(['0'] * optionAmount)
-    print(f"options values are {optionValues}")
+    idVoted = ''
 
+    #logging.info(f"duration is {duration} and {public}")
     try:
         with polls_conn:
             c = polls_conn.cursor()
             # add the poll
             c.execute(
-            "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, :optionNames, :optionValues)",
+            "INSERT INTO polls VALUES (:id, :start_time, :creator, :title, :group, :description, :optionNames, :optionValues, :idVoted, :duration, :public)",
             {'id': id, 'start_time': start_time, 'creator': creator, 'title': title, 'group': group, 
-            'description': description, 'optionNames': optionNames, 'optionValues': optionValues}
+            'description': description, 'optionNames': optionNames, 'optionValues': optionValues, 
+            'idVoted': idVoted, 'duration': duration, 'public': public}
             )
             return True
     except sqlite3.Error as error:
@@ -121,7 +123,10 @@ def init_db():
                 group_ TEXT NOT NULL,
                 description TEXT,
                 optionNames TEXT NOT NULL,
-                optionValues TEXT
+                optionValues TEXT NOT NULL,
+                idVoted TEXT NOT NULL,
+                duration TEXT NOT NULL,
+                public TEXT NOT NULL
             )
             """) #group variable refactored into "group_" as group is a keyword in db
             logging.info("poll table created")
