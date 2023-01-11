@@ -35,9 +35,9 @@ def login():
 def create_poll():
     logging.info("Create poll view")
     token = request.cookies.get('access_token_cookie')
-    print(f"token is {token}")
     verify_jwt_in_request()
     user = get_jwt_identity()
+    logging.info(f"jwt identity is: '{user}'")
     return render_template('create_poll.html', groups=user['groups'], email=user['email'])
 
 @app.route('/process_user_login', methods=['POST'])
@@ -73,8 +73,9 @@ def process_poll_creation():
     group = request.form.get('group_').strip()
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
-    logging.info(f"asdf: '{group}' '{title}' '{creator}' '{description}'")
-    if query.submit_poll(creator, title, group, description, optionNames):
+    public = request.form.get('public').strip()
+    duration = request.form.get('duration').strip()
+    if query.submit_poll(creator, title, group, description, optionNames, duration, public):
         return render_template('index.html')
     return render_template('error.html')
 

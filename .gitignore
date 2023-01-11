@@ -2,3 +2,5 @@ users.db
 database_structure.png
 __pycache__
 polls.db
+discussions.db
+groups.db
