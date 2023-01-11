@@ -11,7 +11,7 @@ def authorize_user(email, password):
     users_conn = sqlite3.connect('users.db')
     with users_conn:
         c = users_conn.cursor()
-        c.execute("SELECT * FROM users WHERE email=? AND hashed_password=?", (email, password))
+        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
         return c.fetchone()
 
 def get_user(email):
@@ -43,15 +43,15 @@ def submit_user(email, password, name, date):
             CREATE TABLE IF NOT EXISTS users 
             (
                 email TEXT UNIQUE NOT NULL,
-                hashed_password TEXT NOT NULL,
+                password TEXT NOT NULL,
                 name TEXT NOT NULL,
                 birthday TEXT NOT NULL,
                 groups TEXT
             )
             """)
             # add the user, all users are in the "0" group, which is THE WORLD
-            c.execute("INSERT INTO users VALUES (:email, :hashed_password, :name, :birthday, :groups)",
-            {'email': email, 'hashed_password': password, 'name': name, 'birthday': date, 'groups': "0"})
+            c.execute("INSERT INTO users VALUES (:email, :password, :name, :birthday, :groups)",
+            {'email': email, 'password': password, 'name': name, 'birthday': date, 'groups': "0"})
             return True
     except:
         return False
@@ -101,7 +101,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS users 
             (
                 email TEXT UNIQUE NOT NULL,
-                hashed_password TEXT NOT NULL,
+                password TEXT NOT NULL,
                 name TEXT NOT NULL,
                 birthday TEXT NOT NULL,
                 groups TEXT

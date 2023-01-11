@@ -10,7 +10,7 @@ _poll_ID_LEN = 11
 
 USER_FIELD = {
     "email": 0,
-    "hashed_password": 1,
+    "password": 1,
     "name": 2,
     "birthday": 3,
     "groups": 4,
