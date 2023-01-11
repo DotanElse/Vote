@@ -35,9 +35,9 @@ def login():
 def create_poll():
     logging.info("Create poll view")
     token = request.cookies.get('access_token_cookie')
-    print(f"token is {token}")
     verify_jwt_in_request()
     user = get_jwt_identity()
+    logging.info(f"jwt identity is: '{user}'")
     return render_template('create_poll.html', groups=user['groups'], email=user['email'])
 
 @app.route('/process_user_login', methods=['POST'])

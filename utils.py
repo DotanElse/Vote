@@ -7,13 +7,15 @@ from flask_jwt_extended import create_access_token
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
 _poll_ID_LEN = 11
+_user_ID_LEN = 6
 
 USER_FIELD = {
-    "email": 0,
-    "password": 1,
-    "name": 2,
-    "birthday": 3,
-    "groups": 4,
+    "id": 0,
+    "email": 1,
+    "password": 2,
+    "name": 3,
+    "birthday": 4,
+    "groups": 5,
 }
 POLL_FIELD = {
     "id": 0,
@@ -32,6 +34,10 @@ POLL_FIELD = {
 def get_random_poll_id():
     characters = string.ascii_lowercase + string.digits
     return "".join(random.choices(characters, k=_poll_ID_LEN))
+
+def get_random_user_id():
+    characters = string.ascii_lowercase + string.digits
+    return "".join(random.choices(characters, k=_user_ID_LEN))
     
 def str_to_list(input):
     # Split the input string on commas
@@ -43,6 +49,7 @@ def list_to_str(input):
     return ', '.join(input)
 
 def get_access_token(user):
+    user_id = user[USER_FIELD['id']]
     user_email = user[USER_FIELD['email']]
     user_name = user[USER_FIELD['name']]
     user_groups = user[USER_FIELD['groups']]
@@ -50,6 +57,7 @@ def get_access_token(user):
 
     # Set the user's ID, name, and email as the identity in the JWT
     return create_access_token(identity={
+        'id': user_id,
         'email': user_email,
         'name': user_name,
         'groups': user_groups,
