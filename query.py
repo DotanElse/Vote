@@ -77,10 +77,22 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
             'description': description, 'optionNames': optionNames, 'optionValues': optionValues, 
             'idVoted': idVoted, 'duration': duration, 'public': public}
             )
-            return True
     except sqlite3.Error as error:
         print(error)
-    return False
+        return False
+    
+    discussions_conn = sqlite3.connect('discussion.db')
+    try:
+        with discussions_conn:
+            c.execute(
+            "INSERT INTO discussions VALUES (:id, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')",
+            {'id', id}
+            )
+    except sqlite3.Error as error:
+        print(error)
+        return False
+        
+    return True
 
 def get_polls_by_groups(): #currently not used
     q = """SELECT * FROM polls WHERE group_ IN (?);"""
@@ -112,6 +124,7 @@ def init_db():
             """)
     except:
         return False
+
     polls_conn = sqlite3.connect('polls.db')
     try:
         with polls_conn:
@@ -135,6 +148,58 @@ def init_db():
             logging.info("poll table created")
     except sqlite3.Error as error:
         print(error)
+        return False
+
+    groups_conn = sqlite3.connect('groups.db')
+    try:
+        with groups_conn:
+            c = groups_conn.cursor()
+            c.execute("""
+            CREATE TABLE IF NOT EXISTS groups
+            (
+                id TEXT UNIQUE NOT NULL,
+                creator TEXT,
+                users TEXT,
+                users_num TEXT,
+                perm_link TEXT NOT NULL,
+                temp_link TEXT,
+                public TEXT  
+            )
+            """)
+    except:
+        return False
+
+    discussions_conn = sqlite3.connect('discussions.db')
+    try:
+        with discussions_conn:
+            c = discussions_conn.cursor()
+            c.execute("""
+            CREATE TABLE IF NOT EXISTS discussions
+            (
+                id TEXT UNIQUE NOT NULL,
+                o1 TEXT,
+                o2 TEXT,
+                o3 TEXT,
+                o4 TEXT,
+                o5 TEXT,
+                o6 TEXT,
+                o7 TEXT,
+                o8 TEXT,
+                o9 TEXT,
+                o10 TEXT,
+                v1 TEXT,
+                v2 TEXT,
+                v3 TEXT,
+                v4 TEXT,
+                v5 TEXT,
+                v6 TEXT,
+                v7 TEXT,
+                v8 TEXT,
+                v9 TEXT,
+                v10 TEXT              
+            )
+            """)
+    except:
         return False
     logging.info("DB initialized")
     return True
