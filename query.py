@@ -78,15 +78,16 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
             'idVoted': idVoted, 'duration': duration, 'public': public}
             )
     except sqlite3.Error as error:
-        print(error)
+        logging.info(f"error of submitting poll {error}")
         return False
     
-    discussions_conn = sqlite3.connect('discussion.db')
+    discussions_conn = sqlite3.connect('discussions.db')
     try:
         with discussions_conn:
+            c = discussions_conn.cursor()
             c.execute(
-            "INSERT INTO discussions VALUES (:id, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '')",
-            {'id', id}
+            "INSERT INTO discussions VALUES (:id, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)",
+            {'id': id}
             )
     except sqlite3.Error as error:
         print(error)

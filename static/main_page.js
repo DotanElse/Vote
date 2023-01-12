@@ -61,3 +61,8 @@ function poll_view(polls)
         select.appendChild(formElement)
     }
 }
+
+function submit_pool_option()
+{
+    console.log("yosi")
+}
