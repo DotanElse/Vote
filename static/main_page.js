@@ -1,9 +1,10 @@
 console.log("-Main page-")
 poll_view(polls)
+submit_pool_option(polls)
+console.log(id)
 
 function poll_view(polls)
 {
-    console.log(polls)
     // get the select element
     var select = document.getElementById('form_wrapper');
   
@@ -15,6 +16,7 @@ function poll_view(polls)
 
         formElement.setAttribute("method", "post");
         var poll_id = polls[i][0]
+        formElement.id = poll_id
         formElement.setAttribute("action", `/process_poll_vote/${poll_id}`);
 
         var poll_name = polls[i][3]
@@ -29,6 +31,7 @@ function poll_view(polls)
             formElement.appendChild(descriptionElement);
 
         var poll_options = polls[i][6].split(',')
+        option_num = 0
         for (const option of poll_options) 
         {
             const optionElement = document.createElement("div");
@@ -42,7 +45,7 @@ function poll_view(polls)
             const radioElement = document.createElement("input");
             radioElement.type = "radio";
             radioElement.name = "radar-option";
-            radioElement.value = `${poll_id}${option}`;
+            radioElement.value = `${option_num}`;
             radioElement.id = `${poll_id}${option}`;
             console.log(`yo, option is: ${radioElement.id}`);
             optionElement.appendChild(radioElement);
@@ -52,6 +55,7 @@ function poll_view(polls)
             optionElement.appendChild(labelElement);
         
             formElement.appendChild(optionElement);
+            option_num++;
         }
         var button = document.createElement("button");
         button.setAttribute("type", "submit");
@@ -62,7 +66,28 @@ function poll_view(polls)
     }
 }
 
-function submit_pool_option()
+function submit_pool_option(polls)
 {
-    console.log("yosi")
+    var cookies = document.cookie.split(';');
+    console.log(cookies)
+    const forms = document.querySelectorAll("form")
+    forms.forEach(form => {
+        console.log(`form loop id is ${form.id}`)
+        form.addEventListener("submit", function(event){
+            event.preventDefault();
+            var formData = new FormData(this);
+            fetch(`/process_poll_vote/${form.id}`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message)
+                // update the page with new data
+            });
+
+    });
+});
+
 }

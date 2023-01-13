@@ -29,7 +29,7 @@ def get_poll(id):
     polls_conn = sqlite3.connect('polls.db')
     with polls_conn:
         c = polls_conn.cursor()
-        c.execute(f"SELECT * FROM polls WHERE id IN ({id});")
+        c.execute("SELECT * FROM polls WHERE id=?", (id,))
         return c.fetchone()
 
 def submit_user(email, password, name, date):
@@ -224,7 +224,8 @@ def get_user_and_polls(email):
         logging.info(f"queries selected '{polls}'")
     return user, polls
 
-def pick_poll_option(email, poll_id, optionNumber):
+def pick_poll_option(id, poll_id, optionNumber):
+    logging.info("yo starting to poll vote thingie pick u know long line so i can see that")
     #get user entry
     #get poll entry
     #check if user voted to that poll
