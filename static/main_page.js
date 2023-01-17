@@ -1,6 +1,6 @@
 console.log("-Main page-")
 poll_view(polls)
-submit_pool_option()
+submit_poll_option()
 function poll_view(polls)
 {
     // get the select element
@@ -57,6 +57,7 @@ function poll_view(polls)
         }
         var button = document.createElement("button");
         button.setAttribute("id", `button_${poll_id}`)
+        button.className = "btn"
         button.setAttribute("type", "submit");
         button.innerHTML = "Submit";
         formElement.appendChild(button);
@@ -65,7 +66,62 @@ function poll_view(polls)
     }
 }
 
-function submit_pool_option()
+function createVotingCanvas(form_id, optionValues, selectedOption) 
+{
+    var canvas = document.createElement('canvas');
+    var ctx = canvas.getContext("2d");
+
+    canvas.width = 500;
+    canvas.height = optionValues.length * 50 - 10;
+    var totalVotes = 0
+    console.log(`optionsVal are ${optionValues}`)
+    for (const option of optionValues)
+    {
+        totalVotes+=parseInt(option);
+    }
+    console.log(`total votes are ${totalVotes}`)
+
+    // Set the bar width and spacing
+    var barHeight = 40;
+    var barSpacing = 10;
+
+    for(var i = 0; i < optionValues.length; i++) {
+        // Calculate the width of the bar as a proportion of the maximum value
+        var barWidth = (optionValues[i] / totalVotes) * canvas.width;
+    
+        // Set the x position of the bar
+        var x = 0;
+    
+        // Set the y position of the bar
+        var y = i * (barHeight + barSpacing);
+        
+        // Draw the bar on the canvas
+        
+        if(i == parseInt(selectedOption))
+        {
+            ctx.fillStyle = "#888E91"
+        }
+        else
+        {
+            ctx.fillStyle = "#CFD9DE"
+        }
+        ctx.fillRect(x, y, barWidth, barHeight);
+        
+        // Calculate the percentage
+        var percentage = ((optionValues[i] / totalVotes) * 100).toFixed(2);
+        
+        // Set the font style and size for the text
+        ctx.font = "20px Arial";
+        
+        // Draw the text next to the bar
+        ctx.fillStyle = "black";
+        ctx.textAlign = "right";
+        ctx.fillText(percentage + "%", 500, y + barHeight/1.5);
+    }
+    return canvas;
+}
+
+function submit_poll_option()
 {
     var cookies = document.cookie.split(';');
     console.log(cookies)
@@ -91,7 +147,10 @@ function submit_pool_option()
                 radios.forEach(function(radio) {
                   radio.disabled = true;
                 });
-                
+                console.log(data.optionValues)
+                console.log(data.selectedOption)
+                curr_form.appendChild(createVotingCanvas(form.id, data.optionValues, data.selectedOption))
+                // TODO - decide on design and make sure the conversion between poll vote view to discussion view is good
             });
 
     });

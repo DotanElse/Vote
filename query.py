@@ -3,7 +3,7 @@ import sqlite3
 import time
 import logging
 from flask import Flask, render_template
-from utils import get_random_poll_id, get_random_user_id, USER_FIELD, POLL_FIELD, str_to_list, list_to_str
+from utils import get_random_poll_id, get_random_user_id, USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, str_to_list, list_to_str
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -37,6 +37,13 @@ def get_poll(id):
     with polls_conn:
         c = polls_conn.cursor()
         c.execute("SELECT * FROM polls WHERE id=?", (id,))
+        return c.fetchone()
+
+def get_discussion(id):
+    discussions_conn = sqlite3.connect('discussions.db')
+    with discussions_conn:
+        c = discussions_conn.cursor()
+        c.execute("SELECT * FROM discussions WHERE id=?", (id,))
         return c.fetchone()
 
 def submit_user(email, password, name, date):
@@ -93,7 +100,7 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
         with discussions_conn:
             c = discussions_conn.cursor()
             c.execute(
-            "INSERT INTO discussions VALUES (:id, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)",
+            "INSERT INTO discussions VALUES (:id, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL)",
             {'id': id}
             )
     except sqlite3.Error as error:
@@ -204,7 +211,17 @@ def init_db():
                 v7 TEXT,
                 v8 TEXT,
                 v9 TEXT,
-                v10 TEXT              
+                v10 TEXT,
+                u1 TEXT,
+                u2 TEXT,
+                u3 TEXT,
+                u4 TEXT,
+                u5 TEXT,
+                u6 TEXT,
+                u7 TEXT,
+                u8 TEXT,
+                u9 TEXT,
+                u10 TEXT
             )
             """)
     except:
@@ -231,11 +248,29 @@ def get_user_and_polls(email):
         logging.info(f"queries selected '{polls}'")
     return user, polls
 
-def update_poll_votes(pool_id, optionValues):
+def update_poll_votes(poll_id, optionValues):
     polls_conn = sqlite3.connect('polls.db')
     with polls_conn:
         c = polls_conn.cursor()
-        c.execute("UPDATE polls SET optionValues = ? WHERE id = ?", (optionValues, pool_id))
+        c.execute("UPDATE polls SET optionValues = ? WHERE id = ?", (optionValues, poll_id))
+        logging.info(f"poll {poll_id} updated his option values")
+    #add user record of voting to the discussion db
+
+def update_discussion_users(id, poll_id, optionNumber):
+    discussion = get_discussion(poll_id)
+    idVoted = str_to_list(discussion[DISCUSSION_FIELD[f"u{optionNumber+1}"]])
+    # if id in idVoted:
+    #     return render_template("error.html") # should never reach here
+    idVoted.append(id)
+    idVoted = list_to_str(idVoted)
+    discussions_conn = sqlite3.connect('discussions.db')
+    try:
+        with discussions_conn:
+            c = discussions_conn.cursor()
+            c.execute(f"UPDATE discussions SET u{optionNumber+1} = ? WHERE id = ?", (idVoted, poll_id))
+            logging.info(f"poll {poll_id} updated his users voting values")
+    except BaseException as e:
+        logging.info(f"exception from adding user to discussion is {e}")
 
 def pick_poll_option(id, poll_id, optionNumber):
     optionNumber = int(optionNumber)
@@ -254,4 +289,5 @@ def pick_poll_option(id, poll_id, optionNumber):
     optionValues[optionNumber] = chosenOption
     optionValues = list_to_str(optionValues)
     update_poll_votes(poll_id, optionValues)
-    logging.info(f"user {id} voted for pool {poll_id} with option number {optionNumber}")
+    update_discussion_users(id, poll_id, optionNumber)
+    logging.info(f"user {id} voted for poll {poll_id} with option number {optionNumber}")

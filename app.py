@@ -103,8 +103,8 @@ def process_poll_creation():
     return render_template('error.html')
 
 @jwt_required
-@app.route('/process_poll_vote/<pool_id>', methods=['POST']) #TODO continue from here 
-def poll_vote(pool_id):
+@app.route('/process_poll_vote/<poll_id>', methods=['POST']) #TODO continue from here 
+def poll_vote(poll_id):
 
     try:
         verify_jwt_in_request()
@@ -112,10 +112,12 @@ def poll_vote(pool_id):
     except BaseException as e:
         logging.warning(f"exception is {e}")
     option_num = request.form.get('radar-option')
-    logging.info(f"id {user['id']} voting on poll {pool_id} for option num {option_num}")
-    query.pick_poll_option(user['id'], pool_id, option_num)
-    return jsonify({"message": f"id {user['id']} voting on poll {pool_id} for option num {option_num}", 
-    "optionValues": "temp"})
+    logging.info(f"id {user['id']} voting on poll {poll_id} for option num {option_num}")
+    query.pick_poll_option(user['id'], poll_id, option_num)
+    optionValues = utils.str_to_list(query.get_poll(poll_id)[utils.POLL_FIELD['optionValues']])
+    logging.info(f"values for {poll_id} are {optionValues} and option_num is {option_num}")
+    return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {option_num}", 
+    "optionValues": optionValues, "selectedOption": option_num})
 
 def temp():
     """Testing tool"""
