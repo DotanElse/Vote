@@ -111,14 +111,11 @@ def poll_vote(pool_id):
         user = get_jwt_identity()
     except BaseException as e:
         logging.warning(f"exception is {e}")
-    
-    logging.error("a")
-    user = get_jwt_identity()
-    logging.error("b")
     option_num = request.form.get('radar-option')
     logging.info(f"id {user['id']} voting on poll {pool_id} for option num {option_num}")
     query.pick_poll_option(user['id'], pool_id, option_num)
-    return jsonify({"message": f"id {user['id']} voting on poll {pool_id} for option num {option_num}"})
+    return jsonify({"message": f"id {user['id']} voting on poll {pool_id} for option num {option_num}", 
+    "optionValues": "temp"})
 
 def temp():
     """Testing tool"""

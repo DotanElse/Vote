@@ -3,7 +3,7 @@ import sqlite3
 import time
 import logging
 from flask import Flask, render_template
-from utils import get_random_poll_id, get_random_user_id, USER_FIELD, POLL_FIELD, str_to_list
+from utils import get_random_poll_id, get_random_user_id, USER_FIELD, POLL_FIELD, str_to_list, list_to_str
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -19,6 +19,13 @@ def get_user(email):
     with users_conn:
         c = users_conn.cursor()
         c.execute("SELECT * FROM users WHERE email=?", (email,))
+        return c.fetchone()
+
+def get_user_by_id(id):
+    users_conn = sqlite3.connect('users.db')
+    with users_conn:
+        c = users_conn.cursor()
+        c.execute("SELECT * FROM users WHERE id=?", (id,))
         return c.fetchone()
 
 def get_user_polls(email): # probably redundent
@@ -224,14 +231,27 @@ def get_user_and_polls(email):
         logging.info(f"queries selected '{polls}'")
     return user, polls
 
+def update_poll_votes(pool_id, optionValues):
+    polls_conn = sqlite3.connect('polls.db')
+    with polls_conn:
+        c = polls_conn.cursor()
+        c.execute("UPDATE polls SET optionValues = ? WHERE id = ?", (optionValues, pool_id))
+
 def pick_poll_option(id, poll_id, optionNumber):
-    logging.info("yo starting to poll vote thingie pick u know long line so i can see that")
-    #get user entry
-    #get poll entry
-    #check if user voted to that poll
-    #assert poll has no more options then optionNumber
-    #get optionValues string from the poll, change it to list
-    #optionValues[optionNumber]++
-    #set it back to string and change the specific poll back
-    #log this "user x voted y"
-    pass
+    optionNumber = int(optionNumber)
+    user = get_user_by_id(id)
+    poll = get_poll(poll_id)
+    voted = str_to_list(poll[POLL_FIELD['idVoted']])
+    if user[USER_FIELD['id']] in voted:
+        return render_template("error.html") # add more logic and response here
+    options = poll[POLL_FIELD['optionNames']]
+    optionAmount = len(str_to_list(options))
+    if optionNumber > optionAmount-1:
+        return render_template("error.html") # add more logic and response here
+    optionValues = str_to_list(poll[POLL_FIELD['optionValues']])
+    chosenOption = optionValues[optionNumber]
+    chosenOption = str(int(chosenOption) + 1)
+    optionValues[optionNumber] = chosenOption
+    optionValues = list_to_str(optionValues)
+    update_poll_votes(poll_id, optionValues)
+    logging.info(f"user {id} voted for pool {poll_id} with option number {optionNumber}")

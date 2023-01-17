@@ -1,8 +1,6 @@
 console.log("-Main page-")
 poll_view(polls)
-submit_pool_option(polls)
-console.log(id)
-
+submit_pool_option()
 function poll_view(polls)
 {
     // get the select element
@@ -16,7 +14,7 @@ function poll_view(polls)
 
         formElement.setAttribute("method", "post");
         var poll_id = polls[i][0]
-        formElement.id = poll_id
+        formElement.id = `${poll_id}`
         formElement.setAttribute("action", `/process_poll_vote/${poll_id}`);
 
         var poll_name = polls[i][3]
@@ -46,18 +44,19 @@ function poll_view(polls)
             radioElement.type = "radio";
             radioElement.name = "radar-option";
             radioElement.value = `${option_num}`;
-            radioElement.id = `${poll_id}${option}`;
+            radioElement.id = `${poll_id}_${option}`;
             console.log(`yo, option is: ${radioElement.id}`);
             optionElement.appendChild(radioElement);
         
             const labelElement = document.createElement("label");
-            labelElement.htmlFor = `${poll_id}${option}`;
+            labelElement.htmlFor = `${poll_id}_${option}`;
             optionElement.appendChild(labelElement);
         
             formElement.appendChild(optionElement);
             option_num++;
         }
         var button = document.createElement("button");
+        button.setAttribute("id", `button_${poll_id}`)
         button.setAttribute("type", "submit");
         button.innerHTML = "Submit";
         formElement.appendChild(button);
@@ -66,7 +65,7 @@ function poll_view(polls)
     }
 }
 
-function submit_pool_option(polls)
+function submit_pool_option()
 {
     var cookies = document.cookie.split(';');
     console.log(cookies)
@@ -84,7 +83,15 @@ function submit_pool_option(polls)
             .then(response => response.json())
             .then(data => {
                 console.log(data.message)
-                // update the page with new data
+                var button = document.getElementById(`button_${form.id}`);
+                button.remove();
+                console.log(`submit button removed for ${form.id}`)
+                var curr_form = document.getElementById(form.id);
+                var radios = curr_form.querySelectorAll('input[name="radar-option"]');
+                radios.forEach(function(radio) {
+                  radio.disabled = true;
+                });
+                
             });
 
     });
