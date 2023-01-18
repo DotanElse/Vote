@@ -28,6 +28,21 @@ function poll_view(polls)
             descriptionElement.textContent = poll_description;
             formElement.appendChild(descriptionElement);
 
+        // creating first div which will hold canvas and option div
+        const formDiv = document.createElement("div");
+        formDiv.id = `div_${poll_id}`
+        //formDiv.setAttribute("position", "relative")
+        formDiv.style.position = "relative";
+        formElement.appendChild(formDiv);
+
+        // creating second div which will hold options
+        const optionDiv = document.createElement("div");
+        optionDiv.id = `option_${poll_id}`;
+        //optionDiv.style.position = "absolute";
+        //optionDiv.style.width = "100%";
+        //optionDiv.style.height = "100%";
+        formDiv.appendChild(optionDiv);
+
         var poll_options = polls[i][6].split(',')
         option_num = 0
         for (const option of poll_options) 
@@ -52,7 +67,7 @@ function poll_view(polls)
             labelElement.htmlFor = `${poll_id}_${option}`;
             optionElement.appendChild(labelElement);
         
-            formElement.appendChild(optionElement);
+            optionDiv.appendChild(optionElement);
             option_num++;
         }
         var button = document.createElement("button");
@@ -61,7 +76,6 @@ function poll_view(polls)
         button.setAttribute("type", "submit");
         button.innerHTML = "Submit";
         formElement.appendChild(button);
-
         select.appendChild(formElement)
     }
 }
@@ -71,8 +85,8 @@ function createVotingCanvas(form_id, optionValues, selectedOption)
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext("2d");
 
-    canvas.width = 500;
-    canvas.height = optionValues.length * 50 - 10;
+    canvas.width = 650;
+    canvas.height = optionValues.length * 51;
     var totalVotes = 0
     console.log(`optionsVal are ${optionValues}`)
     for (const option of optionValues)
@@ -82,7 +96,7 @@ function createVotingCanvas(form_id, optionValues, selectedOption)
     console.log(`total votes are ${totalVotes}`)
 
     // Set the bar width and spacing
-    var barHeight = 40;
+    var barHeight = 41;
     var barSpacing = 10;
 
     for(var i = 0; i < optionValues.length; i++) {
@@ -90,10 +104,10 @@ function createVotingCanvas(form_id, optionValues, selectedOption)
         var barWidth = (optionValues[i] / totalVotes) * canvas.width;
     
         // Set the x position of the bar
-        var x = 0;
+        var x = 30;
     
         // Set the y position of the bar
-        var y = i * (barHeight + barSpacing);
+        var y = i * (barHeight + barSpacing + 0.1) + 5;
         
         // Draw the bar on the canvas
         
@@ -116,8 +130,10 @@ function createVotingCanvas(form_id, optionValues, selectedOption)
         // Draw the text next to the bar
         ctx.fillStyle = "black";
         ctx.textAlign = "right";
-        ctx.fillText(percentage + "%", 500, y + barHeight/1.5);
+        ctx.fillText(percentage + "%", 650, y + barHeight/1.5);
     }
+    canvas.style.position = "absolute"
+    canvas.style.zIndex = "-1"
     return canvas;
 }
 
@@ -143,13 +159,13 @@ function submit_poll_option()
                 button.remove();
                 console.log(`submit button removed for ${form.id}`)
                 var curr_form = document.getElementById(form.id);
+                var curr_form_div = document.getElementById(`div_${form.id}`);
+                var curr_option_div = document.getElementById(`option_${form.id}`);
                 var radios = curr_form.querySelectorAll('input[name="radar-option"]');
                 radios.forEach(function(radio) {
                   radio.disabled = true;
                 });
-                console.log(data.optionValues)
-                console.log(data.selectedOption)
-                curr_form.appendChild(createVotingCanvas(form.id, data.optionValues, data.selectedOption))
+                curr_form_div.insertBefore(createVotingCanvas(form.id, data.optionValues, data.selectedOption), curr_option_div);
                 // TODO - decide on design and make sure the conversion between poll vote view to discussion view is good
             });
 
