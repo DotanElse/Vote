@@ -30,6 +30,39 @@ POLL_FIELD = {
     "duration": 9,
     "public": 10,
 }
+DISCUSSION_FIELD = {
+    "id": 0,
+    "o1": 1,
+    "o2": 2,
+    "o3": 3,
+    "o4": 4,
+    "o5": 5,
+    "o6": 6,
+    "o7": 7,
+    "o8": 8,
+    "o9": 9,
+    "o10": 10,
+    "v1": 11,
+    "v2": 12,
+    "v3": 13,
+    "v4": 14,
+    "v5": 15,
+    "v6": 16,
+    "v7": 17,
+    "v8": 18,
+    "v9": 19,
+    "v10": 20,
+    "u1": 21,
+    "u2": 22,
+    "u3": 23,
+    "u4": 24,
+    "u5": 25,
+    "u6": 26,
+    "u7": 27,
+    "u8": 28,
+    "u9": 29,
+    "u10": 30,
+}
 
 def get_random_poll_id():
     characters = string.ascii_lowercase + string.digits
@@ -41,25 +74,11 @@ def get_random_user_id():
     
 def str_to_list(input):
     # Split the input string on commas
+    if not input:
+        return []
     items = input.split(',')
     # Strip leading and trailing whitespace from each item
     return [item.strip() for item in items]
 
 def list_to_str(input):
     return ', '.join(input)
-
-def get_access_token(user):
-    user_id = user[USER_FIELD['id']]
-    user_email = user[USER_FIELD['email']]
-    user_name = user[USER_FIELD['name']]
-    user_groups = user[USER_FIELD['groups']]
-    user_birthday = user[USER_FIELD['birthday']]
-
-    # Set the user's ID, name, and email as the identity in the JWT
-    return create_access_token(identity={
-        'id': user_id,
-        'email': user_email,
-        'name': user_name,
-        'groups': user_groups,
-        'birthday': user_birthday
-    })
