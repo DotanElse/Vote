@@ -4,10 +4,10 @@ import string
 import logging
 import bcrypt
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
 
-_poll_ID_LEN = 11
-_user_ID_LEN = 6
+_POLL_ID_LEN = 11
+_USER_ID_LEN = 6
 
 USER_FIELD = {
     "id": 0,
@@ -19,7 +19,7 @@ USER_FIELD = {
 }
 POLL_FIELD = {
     "id": 0,
-    "start_time": 1,
+    "startTime": 1,
     "creator": 2,
     "title": 3,
     "group_": 4,
@@ -66,11 +66,11 @@ DISCUSSION_FIELD = {
 
 def get_random_poll_id():
     characters = string.ascii_lowercase + string.digits
-    return "".join(random.choices(characters, k=_poll_ID_LEN))
+    return "".join(random.choices(characters, k=_POLL_ID_LEN))
 
-def get_random_user_id():
+def get_random_userId():
     characters = string.ascii_lowercase + string.digits
-    return "".join(random.choices(characters, k=_user_ID_LEN))
+    return "".join(random.choices(characters, k=_USER_ID_LEN))
     
 def str_to_list(input):
     # Split the input string on commas
@@ -84,13 +84,9 @@ def list_to_str(input):
     return ', '.join(input)
 
 def encrypt(input : str):
-    byteInput = str.encode(input)
-    a = bcrypt.hashpw(byteInput, bcrypt.gensalt())
-    logging.info(f"hashed password is {a}")
-    return a
+    logging.info("start")
+    return bcrypt.hashpw(str.encode(input), bcrypt.gensalt())
 
 def check_password(password, hashed):
-    if bcrypt.checkpw(str.encode(password), hashed):
-        return True
-    else:
-        return False
+    logging.info("start")
+    return bcrypt.checkpw(str.encode(password), hashed)
