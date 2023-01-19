@@ -72,6 +72,9 @@ def get_discussion(id):
 
 def submit_user(email, password, name, date):
     id = get_random_userId()
+    if id_exists(id, "users"):
+        logging.warning(f"existing user id submittion")
+        return submit_user(email, password, name, date)
     try:
         usersConn = sqlite3.connect('users.db')
         with usersConn:
@@ -96,8 +99,25 @@ def submit_user(email, password, name, date):
         logging.warning(f"{e} raised")
         return False
 
+def id_exists(id, db_type):
+    logging.info("start")
+    try:
+        conn = sqlite3.connect(f'{db_type}.db')
+        with conn:
+            c = conn.cursor()
+            c.execute(f"SELECT * FROM {db_type} WHERE id=?", (id,))
+            if c.fetchone() == None:
+                return False
+            return True
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return True
+
 def submit_poll(creator, title, group, description, optionNames, duration, public):
-    id = get_random_poll_id() # stretch - check if same id exists already
+    id = get_random_poll_id()
+    if id_exists(id, "polls"):
+        logging.warning(f"existing poll id submittion")
+        return submit_poll(creator, title, group, description, optionNames, duration, public)
     startTime = int(time.time())
     optionAmount = len(str_to_list(optionNames))
     optionValues = ','.join(['0'] * optionAmount)
