@@ -79,6 +79,14 @@ function poll_view(polls)
         button.innerHTML = "Submit";
         formElement.appendChild(button);
         select.appendChild(formElement)
+        console.log(`${poll_id}`)
+        if (`${poll_id}` in voted)
+        {
+            var optionValues = polls[i][7].split(',')
+            console.log(`values are ${poll_options} and ${typeof(optionValues)}`)
+
+            voted_for_poll(poll_id, optionValues, voted[`${poll_id}`]) 
+        }
         // TODO - start here
         // if(voted.includes(poll_id))
         // {
@@ -155,12 +163,17 @@ function voted_for_poll(form_id, optionValues, selectedOption)
     var curr_form_div = document.getElementById(`div_${form_id}`);
     var curr_option_div = document.getElementById(`option_${form_id}`);
     var radios = curr_form.querySelectorAll('input[name="radar-option"]');
+    var radio_index = 0
     radios.forEach(function(radio) 
     {
         radio.disabled = true;
+        if(radio_index == selectedOption)
+            radio.checked = true;
+        radio_index++;
     });
     curr_form_div.insertBefore(createVotingCanvas(optionValues, selectedOption), curr_option_div);
 }
+
 function submit_poll_option()
 {
     var cookies = document.cookie.split(';');
@@ -179,7 +192,7 @@ function submit_poll_option()
             .then(response => response.json())
             .then(data => {
                 console.log(data.message);
-                voted_for_poll(form.id, data.optionValues, data.selectedOption);
+                voted_for_poll(form.id, data.optionValues, data.selectedOption); 
             });
 
     });
