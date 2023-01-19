@@ -2,7 +2,7 @@
 import random
 import string
 import logging
-from flask_jwt_extended import create_access_token
+import bcrypt
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
@@ -82,3 +82,15 @@ def str_to_list(input):
 
 def list_to_str(input):
     return ', '.join(input)
+
+def encrypt(input : str):
+    byteInput = str.encode(input)
+    a = bcrypt.hashpw(byteInput, bcrypt.gensalt())
+    logging.info(f"hashed password is {a}")
+    return a
+
+def check_password(password, hashed):
+    if bcrypt.checkpw(str.encode(password), hashed):
+        return True
+    else:
+        return False

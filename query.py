@@ -3,16 +3,20 @@ import sqlite3
 import time
 import logging
 from flask import Flask, render_template
-from utils import get_random_poll_id, get_random_user_id, USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, str_to_list, list_to_str
+from utils import (
+    get_random_poll_id, get_random_user_id, 
+    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, 
+    str_to_list, list_to_str,
+    check_password)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
 
 def authorize_user(email, password):
-    users_conn = sqlite3.connect('users.db')
-    with users_conn:
-        c = users_conn.cursor()
-        c.execute("SELECT * FROM users WHERE email=? AND password=?", (email, password))
-        return c.fetchone()
+    user = get_user(email)
+    hashed = user[USER_FIELD['password']]
+    if check_password(password, hashed):
+        return user
+    return False
 
 def get_user(email):
     users_conn = sqlite3.connect('users.db')

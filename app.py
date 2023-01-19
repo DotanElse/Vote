@@ -84,9 +84,8 @@ def process_login_form():
 def process_register_form():
     name = request.form['name']
     email = request.form['email']
-    password = request.form['password']
+    password = utils.encrypt(request.form['password'])
     birthday = request.form['birthday']
-    # TODO add hashing of password 
     if query.submit_user(email, password, name, birthday):
         return render_template('index.html')
     return render_template('error.html') # eventually change to popup at main site (additional param to main_page)
