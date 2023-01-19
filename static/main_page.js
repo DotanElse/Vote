@@ -1,13 +1,15 @@
 console.log("-Main page-")
+console.log(voted)
 poll_view(polls)
 submit_poll_option()
+
 function poll_view(polls)
 {
     // get the select element
     var select = document.getElementById('form_wrapper');
   
     // create forms
-    for (var i = 0; i < polls.length; i++) 
+    for (var i = 0; i < polls.length; i++)
     {
         const formElement = document.createElement("form");
         formElement.classList.add("radar-form");
@@ -77,10 +79,25 @@ function poll_view(polls)
         button.innerHTML = "Submit";
         formElement.appendChild(button);
         select.appendChild(formElement)
+        console.log(`${poll_id}`)
+        if (`${poll_id}` in voted)
+        {
+            var optionValues = polls[i][7].split(',')
+            console.log(`values are ${poll_options} and ${typeof(optionValues)}`)
+
+            voted_for_poll(poll_id, optionValues, voted[`${poll_id}`]) 
+        }
+        // TODO - start here
+        // if(voted.includes(poll_id))
+        // {
+        //     var a = 1 
+        //     //select option of radar with the voted option
+        //     //call the voted_for_poll with form_id, optionValues, selected
+        // }
     }
 }
 
-function createVotingCanvas(form_id, optionValues, selectedOption) 
+function createVotingCanvas(optionValues, selectedOption) 
 {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext("2d");
@@ -137,6 +154,26 @@ function createVotingCanvas(form_id, optionValues, selectedOption)
     return canvas;
 }
 
+function voted_for_poll(form_id, optionValues, selectedOption)
+{
+    var button = document.getElementById(`button_${form_id}`);
+    button.remove();
+    console.log(`submit button removed for ${form_id}`)
+    var curr_form = document.getElementById(form_id);
+    var curr_form_div = document.getElementById(`div_${form_id}`);
+    var curr_option_div = document.getElementById(`option_${form_id}`);
+    var radios = curr_form.querySelectorAll('input[name="radar-option"]');
+    var radio_index = 0
+    radios.forEach(function(radio) 
+    {
+        radio.disabled = true;
+        if(radio_index == selectedOption)
+            radio.checked = true;
+        radio_index++;
+    });
+    curr_form_div.insertBefore(createVotingCanvas(optionValues, selectedOption), curr_option_div);
+}
+
 function submit_poll_option()
 {
     var cookies = document.cookie.split(';');
@@ -154,19 +191,8 @@ function submit_poll_option()
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data.message)
-                var button = document.getElementById(`button_${form.id}`);
-                button.remove();
-                console.log(`submit button removed for ${form.id}`)
-                var curr_form = document.getElementById(form.id);
-                var curr_form_div = document.getElementById(`div_${form.id}`);
-                var curr_option_div = document.getElementById(`option_${form.id}`);
-                var radios = curr_form.querySelectorAll('input[name="radar-option"]');
-                radios.forEach(function(radio) {
-                  radio.disabled = true;
-                });
-                curr_form_div.insertBefore(createVotingCanvas(form.id, data.optionValues, data.selectedOption), curr_option_div);
-                // TODO - decide on design and make sure the conversion between poll vote view to discussion view is good
+                console.log(data.message);
+                voted_for_poll(form.id, data.optionValues, data.selectedOption); 
             });
 
     });
