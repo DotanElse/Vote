@@ -13,6 +13,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message
 
 def authorize_user(email, password):
     user = get_user(email)
+    if not user:
+        return False
     hashed = user[USER_FIELD['password']]
     if check_password(password, hashed):
         return user
@@ -265,6 +267,8 @@ def get_voted(id, polls):
 
 def get_user_and_polls(email):
     user = get_user(email)
+    if not user:
+        return None, None
     nameField = user[USER_FIELD["name"]]
     logging.info(f"user '{nameField}' selected for main page")
     groupField = str_to_list(user[USER_FIELD["groups"]])
@@ -320,6 +324,8 @@ def pick_poll_option(id, poll_id, optionNumber):
     optionNumber = int(optionNumber)
     user = get_user_by_id(id)
     poll = get_poll(poll_id)
+    if not user or not poll:
+        logging.error("pick_poll_option db error")
     voted = str_to_list(poll[POLL_FIELD['idVoted']])
     if user[USER_FIELD['id']] in voted:
         return render_template("error.html") # add more logic and response here

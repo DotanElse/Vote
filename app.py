@@ -70,6 +70,9 @@ def process_login_form():
     if not query.authorize_user(email, password):
         return render_template("failed_login.html")
     user, polls = query.get_user_and_polls(email)
+    if (not user):
+        logging.info("Couldnt get user")
+        return render_template("error.html")
     id = query.get_user(email)[utils.USER_FIELD['id']]
     accessToken = create_jwt_access_token(user)
     print(f"access: '{accessToken} and id {id}'\n")
