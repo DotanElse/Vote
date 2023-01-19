@@ -44,22 +44,22 @@ def create_poll():
     return render_template('create_poll.html', groups=user['groups'], email=user['email'])
 
 def create_jwt_access_token(user):
-    user_id = user[utils.USER_FIELD['id']]
-    user_email = user[utils.USER_FIELD['email']]
-    user_name = user[utils.USER_FIELD['name']]
-    user_groups = user[utils.USER_FIELD['groups']]
-    user_birthday = user[utils.USER_FIELD['birthday']]
+    userId = user[utils.USER_FIELD['id']]
+    userEmail = user[utils.USER_FIELD['email']]
+    userName = user[utils.USER_FIELD['name']]
+    userGroups = user[utils.USER_FIELD['groups']]
+    userBirthday = user[utils.USER_FIELD['birthday']]
 
     # Set the user's ID, name, and email as the identity in the JWT
-    access_token = create_access_token(identity={
-        'id': user_id,
-        'email': user_email,
-        'name': user_name,
-        'groups': user_groups,
-        'birthday': user_birthday
+    accessToken = create_access_token(identity={
+        'id': userId,
+        'email': userEmail,
+        'name': userName,
+        'groups': userGroups,
+        'birthday': userBirthday
     })
-    logging.info(f"access token is {access_token}")
-    return access_token
+    logging.info(f"access token is {accessToken}")
+    return accessToken
 
 
 @app.route('/process_user_login', methods=['POST'])
@@ -67,17 +67,16 @@ def process_login_form():
     logging.info("Processing logging form")
     email = request.form['email']
     password = request.form['password']
-    # TODO add check of hashing password
     if not query.authorize_user(email, password):
         return render_template("failed_login.html")
     user, polls = query.get_user_and_polls(email)
     id = query.get_user(email)[utils.USER_FIELD['id']]
-    access_token = create_jwt_access_token(user)
-    print(f"access: '{access_token} and id {id}'\n")
+    accessToken = create_jwt_access_token(user)
+    print(f"access: '{accessToken} and id {id}'\n")
     voted = query.get_voted(id, polls)
     logging.info(f"polls are {polls}")
     resp = make_response(render_template('main_page.html', id=id, polls=polls, voted=voted))
-    resp.set_cookie('access_token_cookie', value=access_token, expires=datetime.utcnow() + timedelta(hours=3))
+    resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     
 @app.route('/process_user_register', methods=['POST'])
@@ -112,13 +111,13 @@ def poll_vote(poll_id):
         user = get_jwt_identity()
     except BaseException as e:
         logging.warning(f"exception is {e}")
-    option_num = request.form.get('radar-option')
-    logging.info(f"id {user['id']} voting on poll {poll_id} for option num {option_num}")
-    query.pick_poll_option(user['id'], poll_id, option_num)
+    optionNum = request.form.get('radar-option')
+    logging.info(f"id {user['id']} voting on poll {poll_id} for option num {optionNum}")
+    query.pick_poll_option(user['id'], poll_id, optionNum)
     optionValues = utils.str_to_list(query.get_poll(poll_id)[utils.POLL_FIELD['optionValues']])
-    logging.info(f"values for {poll_id} are {optionValues} and option_num is {option_num}")
-    return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {option_num}", 
-    "optionValues": optionValues, "selectedOption": option_num})
+    logging.info(f"values for {poll_id} are {optionValues} and optionNum is {optionNum}")
+    return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {optionNum}", 
+    "optionValues": optionValues, "selectedOption": optionNum})
 
 if __name__ == '__main__':
     #print(query.submit_poll("creator", "title", "1", "desc", "asdf, bani"))

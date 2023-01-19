@@ -19,9 +19,9 @@ function poll_view(polls)
         formElement.id = `${poll_id}`
         formElement.setAttribute("action", `/process_poll_vote/${poll_id}`);
 
-        var poll_name = polls[i][3]
+        var pollName = polls[i][3]
         const titleElement = document.createElement("h1");
-        titleElement.textContent = poll_name;
+        titleElement.textContent = pollName;
         formElement.appendChild(titleElement);
 
         const poll_description = polls[i][5]
@@ -33,21 +33,16 @@ function poll_view(polls)
         // creating first div which will hold canvas and option div
         const formDiv = document.createElement("div");
         formDiv.id = `div_${poll_id}`
-        //formDiv.setAttribute("position", "relative")
         formDiv.style.position = "relative";
         formElement.appendChild(formDiv);
 
-        // creating second div which will hold options
         const optionDiv = document.createElement("div");
         optionDiv.id = `option_${poll_id}`;
-        //optionDiv.style.position = "absolute";
-        //optionDiv.style.width = "100%";
-        //optionDiv.style.height = "100%";
         formDiv.appendChild(optionDiv);
 
-        var poll_options = polls[i][6].split(',')
-        option_num = 0
-        for (const option of poll_options) 
+        var pollOptions = polls[i][6].split(',');
+        optionNum = 0;
+        for (const option of pollOptions) 
         {
             const optionElement = document.createElement("div");
             optionElement.classList.add("option"); 
@@ -60,7 +55,7 @@ function poll_view(polls)
             const radioElement = document.createElement("input");
             radioElement.type = "radio";
             radioElement.name = "radar-option";
-            radioElement.value = `${option_num}`;
+            radioElement.value = `${optionNum}`;
             radioElement.id = `${poll_id}_${option}`;
             console.log(`yo, option is: ${radioElement.id}`);
             optionElement.appendChild(radioElement);
@@ -70,41 +65,34 @@ function poll_view(polls)
             optionElement.appendChild(labelElement);
         
             optionDiv.appendChild(optionElement);
-            option_num++;
+            optionNum++;
         }
         var button = document.createElement("button");
-        button.setAttribute("id", `button_${poll_id}`)
-        button.className = "btn"
+        button.setAttribute("id", `button_${poll_id}`);
+        button.className = "btn";
         button.setAttribute("type", "submit");
         button.innerHTML = "Submit";
         formElement.appendChild(button);
-        select.appendChild(formElement)
-        console.log(`${poll_id}`)
+        select.appendChild(formElement);
+        console.log(`${poll_id}`);
         if (`${poll_id}` in voted)
         {
-            var optionValues = polls[i][7].split(',')
-            console.log(`values are ${poll_options} and ${typeof(optionValues)}`)
+            var optionValues = polls[i][7].split(',');
+            console.log(`values are ${pollOptions} and ${typeof(optionValues)}`);
 
-            voted_for_poll(poll_id, optionValues, voted[`${poll_id}`]) 
+            voted_for_poll(poll_id, optionValues, voted[`${poll_id}`]);
         }
-        // TODO - start here
-        // if(voted.includes(poll_id))
-        // {
-        //     var a = 1 
-        //     //select option of radar with the voted option
-        //     //call the voted_for_poll with form_id, optionValues, selected
-        // }
     }
 }
 
-function createVotingCanvas(optionValues, selectedOption) 
+function create_voting_canvas(optionValues, selectedOption) 
 {
     var canvas = document.createElement('canvas');
     var ctx = canvas.getContext("2d");
 
     canvas.width = 650;
     canvas.height = optionValues.length * 51;
-    var totalVotes = 0
+    var totalVotes = 0;
     console.log(`optionsVal are ${optionValues}`)
     for (const option of optionValues)
     {
@@ -130,11 +118,11 @@ function createVotingCanvas(optionValues, selectedOption)
         
         if(i == parseInt(selectedOption))
         {
-            ctx.fillStyle = "#888E91"
+            ctx.fillStyle = "#888E91";
         }
         else
         {
-            ctx.fillStyle = "#CFD9DE"
+            ctx.fillStyle = "#CFD9DE";
         }
         ctx.fillRect(x, y, barWidth, barHeight);
         
@@ -149,8 +137,8 @@ function createVotingCanvas(optionValues, selectedOption)
         ctx.textAlign = "right";
         ctx.fillText(percentage + "%", 650, y + barHeight/1.5);
     }
-    canvas.style.position = "absolute"
-    canvas.style.zIndex = "-1"
+    canvas.style.position = "absolute";
+    canvas.style.zIndex = "-1";
     return canvas;
 }
 
@@ -158,20 +146,20 @@ function voted_for_poll(form_id, optionValues, selectedOption)
 {
     var button = document.getElementById(`button_${form_id}`);
     button.remove();
-    console.log(`submit button removed for ${form_id}`)
-    var curr_form = document.getElementById(form_id);
-    var curr_form_div = document.getElementById(`div_${form_id}`);
-    var curr_option_div = document.getElementById(`option_${form_id}`);
-    var radios = curr_form.querySelectorAll('input[name="radar-option"]');
-    var radio_index = 0
+    console.log(`submit button removed for ${form_id}`);
+    var currForm = document.getElementById(form_id);
+    var currFormDiv = document.getElementById(`div_${form_id}`);
+    var currOptionDiv = document.getElementById(`option_${form_id}`);
+    var radios = currForm.querySelectorAll('input[name="radar-option"]');
+    var radioIndex = 0;
     radios.forEach(function(radio) 
     {
         radio.disabled = true;
-        if(radio_index == selectedOption)
+        if(radioIndex == selectedOption)
             radio.checked = true;
-        radio_index++;
+        radioIndex++;
     });
-    curr_form_div.insertBefore(createVotingCanvas(optionValues, selectedOption), curr_option_div);
+    currFormDiv.insertBefore(create_voting_canvas(optionValues, selectedOption), currOptionDiv);
 }
 
 function submit_poll_option()
@@ -195,7 +183,6 @@ function submit_poll_option()
                 voted_for_poll(form.id, data.optionValues, data.selectedOption); 
             });
 
+        });
     });
-});
-
 }
