@@ -4,7 +4,7 @@ import string
 import logging
 import bcrypt
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
 
 _POLL_ID_LEN = 11
 _USER_ID_LEN = 6
@@ -84,7 +84,9 @@ def list_to_str(input):
     return ', '.join(input)
 
 def encrypt(input : str):
+    logging.info("start")
     return bcrypt.hashpw(str.encode(input), bcrypt.gensalt())
 
 def check_password(password, hashed):
+    logging.info("start")
     return bcrypt.checkpw(str.encode(password), hashed)

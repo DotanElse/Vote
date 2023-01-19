@@ -7,20 +7,25 @@ from utils import (
     get_random_poll_id, get_random_userId, 
     USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, 
     str_to_list, list_to_str,
-    check_password)
+    check_password
+)
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(module)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
 
 def authorize_user(email, password):
-    user = get_user(email)
+    logging.info("start")
+
+    user = get_user_by_email(email)
     if not user:
         return False
+
     hashed = user[USER_FIELD['password']]
     if check_password(password, hashed):
         return user
     return False
 
-def get_user(email):
+def get_user_by_email(email):
+    logging.info("start")
     try:
         usersConn = sqlite3.connect('users.db')
         with usersConn:
@@ -28,10 +33,11 @@ def get_user(email):
             c.execute("SELECT * FROM users WHERE email=?", (email,))
             return c.fetchone()
     except BaseException as e:
-        logging.warning(f"{e} raised on get_user")
+        logging.warning(f"{e} raised")
         return None
 
 def get_user_by_id(id):
+    logging.info("start")
     try:
         usersConn = sqlite3.connect('users.db')
         with usersConn:
@@ -39,7 +45,7 @@ def get_user_by_id(id):
             c.execute("SELECT * FROM users WHERE id=?", (id,))
             return c.fetchone()
     except BaseException as e:
-        logging.warning(f"{e} raised on get_user_by_id")
+        logging.warning(f"{e} raised")
         return None
 
 def get_poll(id):
@@ -50,7 +56,7 @@ def get_poll(id):
             c.execute("SELECT * FROM polls WHERE id=?", (id,))
             return c.fetchone()
     except BaseException as e:
-        logging.warning(f"{e} raised on get_poll")
+        logging.warning(f"{e} raised")
         return None
 
 def get_discussion(id):
@@ -61,7 +67,7 @@ def get_discussion(id):
             c.execute("SELECT * FROM discussions WHERE id=?", (id,))
             return c.fetchone()
     except BaseException as e:
-        logging.warning(f"{e} raised on get_discussion")
+        logging.warning(f"{e} raised")
         return None
 
 def submit_user(email, password, name, date):
@@ -87,7 +93,7 @@ def submit_user(email, password, name, date):
             {'id': id, 'email': email, 'password': password, 'name': name, 'birthday': date, 'groups': "0"})
             return True
     except BaseException as e:
-        logging.warning(f"{e} raised on get_discussion")
+        logging.warning(f"{e} raised")
         return False
 
 def submit_poll(creator, title, group, description, optionNames, duration, public):
@@ -108,7 +114,7 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
             'idVoted': idVoted, 'duration': duration, 'public': public}
             )
     except BaseException as e:
-        logging.warning(f"{e} raised on submit_poll, 1")
+        logging.warning(f"{e} raised, 1")
         return False
 
     try:
@@ -120,11 +126,12 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
             {'id': id}
             )
     except BaseException as e:
-        logging.warning(f"{e} raised on submit_poll, 2")
+        logging.warning(f"{e} raised, 2")
         return False
     return True
 
 def init_db():
+    logging.info("start")
     try:
         usersConn = sqlite3.connect('users.db')
         with usersConn:
@@ -142,7 +149,7 @@ def init_db():
             )
             """)
     except BaseException as e:
-        logging.warning(f"{e} raised on init_db, 1")
+        logging.warning(f"{e} raised, 1")
         return False
 
     try:
@@ -165,9 +172,8 @@ def init_db():
                 public TEXT NOT NULL
             )
             """) #group variable refactored into "group_" as group is a keyword in db
-            logging.info("poll table created")
     except BaseException as e:
-        logging.warning(f"{e} raised on init_db, 2")
+        logging.warning(f"{e} raised, 2")
         return False
 
     try:
@@ -187,7 +193,7 @@ def init_db():
             )
             """)
     except BaseException as e:
-        logging.warning(f"{e} raised on init_db, 3")
+        logging.warning(f"{e} raised, 3")
         return False
 
     try:
@@ -231,18 +237,18 @@ def init_db():
             )
             """)
     except BaseException as e:
-        logging.warning(f"{e} raised on init_db, 4")
+        logging.warning(f"{e} raised, 4")
         return False
-    logging.info("DB initialized")
     return True
 
 def find_vote(id, discussion):
+    logging.info("start")
     for i in range(1, 11):
         if id in str_to_list(discussion[DISCUSSION_FIELD[f"u{i}"]]):
             return i-1
-    logging.info("Error finding voted")
 
 def get_voted(id, polls):
+    logging.info("start")
     voted = {}
     poll_id = []
     for poll in polls:
@@ -254,56 +260,53 @@ def get_voted(id, polls):
         discussionsConn = sqlite3.connect('discussions.db')
         with discussionsConn:
             c = discussionsConn.cursor()
-            logging.info(f"query to run is '{query}' and pool id is {poll_id}")
             c.execute(query, poll_id)
             discussions = c.fetchall() # all discussions that the user have voted
         for discussion in discussions:
             choice = find_vote(id, discussion)
             voted[f"{discussion[DISCUSSION_FIELD['id']]}"] = choice
     except BaseException as e:
-        logging.warning(f"{e} raised on get_voted")
+        logging.warning(f"{e} raised")
         return False  
     return voted
 
 def get_user_and_polls(email):
-    user = get_user(email)
+    logging.info("start")
+    user = get_user_by_email(email)
     if not user:
         return None, None
     nameField = user[USER_FIELD["name"]]
-    logging.info(f"user '{nameField}' selected for main page")
     groupField = str_to_list(user[USER_FIELD["groups"]])
     # Build the query string for getting all polls related to specific user
     placeholders = ', '.join(['?'] * len(groupField))
     query = f"SELECT * FROM polls WHERE group_ IN ({placeholders});"
-    logging.info(f"query for main page is '{query}'")
     polls = []
     try:
         pollsConn = sqlite3.connect('polls.db')
         with pollsConn:
             c = pollsConn.cursor()
-            logging.info(f"query to run is '{query}' and groups are {groupField}")
             c.execute(query, groupField)
             polls = c.fetchall()
-            logging.info(f"queries selected '{polls}'")
         return user, polls
     except BaseException as e:
-        logging.warning(f"{e} raised on get_user_and_polls")
+        logging.warning(f"{e} raised")
         return None, None
 
 def update_poll_votes(poll_id, optionValues, voters):
+    logging.info("start")
     try:
         pollsConn = sqlite3.connect('polls.db')
         with pollsConn:
             c = pollsConn.cursor()
             c.execute("UPDATE polls SET optionValues = ?, idVoted = ? WHERE id = ?", (optionValues, voters, poll_id))
-            logging.info(f"poll {poll_id} updated his option values")
     except BaseException as e:
-        logging.warning(f"{e} raised on update_poll_votes")
+        logging.warning(f"{e} raised")
         return False
     #add user record of voting to the discussion db
 
 
 def update_discussion_users(id, poll_id, optionNumber):
+    logging.info("start")
     discussion = get_discussion(poll_id)
     idVoted = str_to_list(discussion[DISCUSSION_FIELD[f"u{optionNumber+1}"]])
     if id in idVoted:
@@ -315,26 +318,29 @@ def update_discussion_users(id, poll_id, optionNumber):
         with discussionsConn:
             c = discussionsConn.cursor()
             c.execute(f"UPDATE discussions SET u{optionNumber+1} = ? WHERE id = ?", (idVoted, poll_id))
-            logging.info(f"poll {poll_id} updated his users voting values")
     except BaseException as e:
-        logging.warning(f"{e} raised on update_discussion_users")
+        logging.warning(f"{e} raised")
         return False
 
 def pick_poll_option(id, poll_id, optionNumber):
+    logging.info("start")
     optionNumber = int(optionNumber)
     user = get_user_by_id(id)
     poll = get_poll(poll_id)
     if not user or not poll:
-        logging.error("pick_poll_option db error")
+        logging.error("critical db error") #shouldnt get here
+
     voted = str_to_list(poll[POLL_FIELD['idVoted']])
     if user[USER_FIELD['id']] in voted:
-        return render_template("error.html") # add more logic and response here
+        return render_template("error.html") # user already voted
     voted.append(id)
     voted = list_to_str(voted)
+
     options = poll[POLL_FIELD['optionNames']]
     optionAmount = len(str_to_list(options))
     if optionNumber > optionAmount-1:
-        return render_template("error.html") # add more logic and response here
+        return render_template("error.html") # user voted to unknown option
+
     optionValues = str_to_list(poll[POLL_FIELD['optionValues']])
     chosenOption = optionValues[optionNumber]
     chosenOption = str(int(chosenOption) + 1)
@@ -342,4 +348,3 @@ def pick_poll_option(id, poll_id, optionNumber):
     optionValues = list_to_str(optionValues)
     update_poll_votes(poll_id, optionValues, voted)
     update_discussion_users(id, poll_id, optionNumber)
-    logging.info(f"user {id} voted for poll {poll_id} with option number {optionNumber}")
