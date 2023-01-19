@@ -73,8 +73,10 @@ def process_login_form():
     user, polls = query.get_user_and_polls(email)
     id = query.get_user(email)[utils.USER_FIELD['id']]
     access_token = create_jwt_access_token(user)
-    print(f"access: '{access_token} and id {id}'")
-    resp = make_response(render_template('main_page.html', id=id, polls=polls))
+    print(f"access: '{access_token} and id {id}'\n")
+    voted = query.get_voted(id, polls)
+    logging.info(f"polls are {polls}")
+    resp = make_response(render_template('main_page.html', id=id, polls=polls, voted=voted))
     resp.set_cookie('access_token_cookie', value=access_token, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     

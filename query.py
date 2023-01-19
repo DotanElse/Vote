@@ -229,6 +229,33 @@ def init_db():
     logging.info("DB initialized")
     return True
 
+def find_vote(id, discussion):
+    for i in range(1, 11):
+        if id in str_to_list(discussion[DISCUSSION_FIELD[f"u{i}"]]):
+            return i-1
+    logging.info("Error finding voted")
+
+def get_voted(id, polls):
+    voted = {}
+    poll_id = []
+    for poll in polls:
+        if id in str_to_list(poll[POLL_FIELD['idVoted']]):
+            poll_id.append(poll[POLL_FIELD['id']])
+    placeholders = ', '.join(['?'] * len(poll_id))
+    query = f"SELECT * FROM discussions WHERE id IN ({placeholders});"
+    discussions_conn = sqlite3.connect('discussions.db')
+    with discussions_conn:
+        c = discussions_conn.cursor()
+        logging.info(f"query to run is '{query}' and pool id is {poll_id}")
+        c.execute(query, poll_id)
+        discussions = c.fetchall() # all discussions that the user have voted
+    for discussion in discussions:
+        choice = find_vote(id, discussion)
+        voted[f"{discussion[DISCUSSION_FIELD['id']]}"] = choice
+    
+    logging.info(f"* user voting dict is {voted}")
+    return voted
+
 def get_user_and_polls(email):
     user = get_user(email)
     name_field = user[USER_FIELD["name"]]
@@ -248,13 +275,14 @@ def get_user_and_polls(email):
         logging.info(f"queries selected '{polls}'")
     return user, polls
 
-def update_poll_votes(poll_id, optionValues):
+def update_poll_votes(poll_id, optionValues, voters):
     polls_conn = sqlite3.connect('polls.db')
     with polls_conn:
         c = polls_conn.cursor()
-        c.execute("UPDATE polls SET optionValues = ? WHERE id = ?", (optionValues, poll_id))
+        c.execute("UPDATE polls SET optionValues = ?, idVoted = ? WHERE id = ?", (optionValues, voters, poll_id))
         logging.info(f"poll {poll_id} updated his option values")
     #add user record of voting to the discussion db
+
 
 def update_discussion_users(id, poll_id, optionNumber):
     discussion = get_discussion(poll_id)
@@ -279,6 +307,8 @@ def pick_poll_option(id, poll_id, optionNumber):
     voted = str_to_list(poll[POLL_FIELD['idVoted']])
     if user[USER_FIELD['id']] in voted:
         return render_template("error.html") # add more logic and response here
+    voted.append(id)
+    voted = list_to_str(voted)
     options = poll[POLL_FIELD['optionNames']]
     optionAmount = len(str_to_list(options))
     if optionNumber > optionAmount-1:
@@ -288,6 +318,6 @@ def pick_poll_option(id, poll_id, optionNumber):
     chosenOption = str(int(chosenOption) + 1)
     optionValues[optionNumber] = chosenOption
     optionValues = list_to_str(optionValues)
-    update_poll_votes(poll_id, optionValues)
+    update_poll_votes(poll_id, optionValues, voted)
     update_discussion_users(id, poll_id, optionNumber)
     logging.info(f"user {id} voted for poll {poll_id} with option number {optionNumber}")
