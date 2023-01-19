@@ -120,10 +120,6 @@ def poll_vote(poll_id):
     return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {option_num}", 
     "optionValues": optionValues, "selectedOption": option_num})
 
-def temp():
-    """Testing tool"""
-    query.get_polls_by_groups()
-
 if __name__ == '__main__':
     #print(query.submit_poll("creator", "title", "1", "desc", "asdf, bani"))
     #a = temp()
