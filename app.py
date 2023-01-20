@@ -44,6 +44,17 @@ def create_poll():
 
     return render_template('create_poll.html', groups=user['groups'], email=user['email'])
 
+@jwt_required
+@app.route('/create_group')
+def create_group():
+    logging.info("start")
+
+    token = request.cookies.get('access_token_cookie')
+    verify_jwt_in_request()
+    user = get_jwt_identity()
+
+    return render_template('create_group.html', id=user['id'])
+
 def create_jwt_access_token(user):
     logging.info("start")
 
@@ -113,6 +124,19 @@ def process_poll_creation():
     if query.submit_poll(creator, title, group, description, optionNames, duration, public):
         return render_template('index.html')
     
+    return render_template('error.html')
+
+@app.route('/process_group_creation', methods=['POST'])
+def process_group_creation():
+    logging.info("start")
+    
+    creator = request.form.get('creator').strip()
+    groupName = request.form.get('name').strip()
+    description = request.form.get('description').strip()
+    public = request.form.get('public').strip()
+
+    if query.submit_group(creator, groupName, description, public):
+        return render_template('index.html')
     return render_template('error.html')
 
 @jwt_required

@@ -1,0 +1,25 @@
+  <head>
+    <meta charset="utf-8">
+    <title>Group creation</title>
+    <script src="../static/create_group.js" defer></script>
+  </head>
+  <body>
+    <div class="title_container">
+      <form id="poll-form" action="/process_group_creation" method="post"> <!-- #TODO - appear on button and form popup -->
+        <label for="name">Group name:</label><br>
+        <input type="text" id="name" name="name" required><br>
+        <label for="description">Description(optional):</label><br>
+        <input type="text" id="description" name="description"><br><br>
+        <input type="hidden" name="creator" value="{{ id }}">
+        <select name="public" id="public" required>
+          <option selected>Public</option>
+          <option>Private</option>
+        </select><br><br>
+        <input type="submit" value="Submit">
+      </form>
+    </div>
+  </body>
+  <script type="text/javascript">
+    id = JSON.parse('{{id|tojson|safe}}')
+  </script>
+</html>

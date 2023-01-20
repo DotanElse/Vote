@@ -4,7 +4,7 @@ import time
 import logging
 from flask import Flask, render_template
 from utils import (
-    get_random_poll_id, get_random_userId, 
+    get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
     USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, 
     str_to_list, list_to_str,
     check_password
@@ -71,7 +71,7 @@ def get_discussion(id):
         return None
 
 def submit_user(email, password, name, date):
-    id = get_random_userId()
+    id = get_random_user_id()
     if id_exists(id, "users"):
         logging.warning(f"existing user id submittion")
         return submit_user(email, password, name, date)
@@ -112,6 +112,28 @@ def id_exists(id, db_type):
     except BaseException as e:
         logging.warning(f"{e} raised")
         return True
+
+def submit_group(creator, name, description, public):
+    logging.info("start")
+    id = get_random_group_id()
+    if id_exists(id, "polls"):
+        logging.warning(f"existing group id submittion")
+        return submit_group(creator, description, public)
+    permLink = get_random_perm_link()
+    try:
+        groupConn = sqlite3.connect('groups.db')
+        with groupConn:
+            c = groupConn.cursor()
+            # add the poll
+            c.execute(
+            "INSERT INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :tempLink, :public)",
+            {'id': id, 'name': name, 'description': description, 'creator': creator, 'users': creator, 'usersNum': 1,
+            'permLink': permLink, 'tempLink': '', 'public': public}
+            )
+        return True
+    except BaseException as e:
+        logging.warning(f"{e} raised, 1")
+        return False
 
 def submit_poll(creator, title, group, description, optionNames, duration, public):
     id = get_random_poll_id()
@@ -204,12 +226,14 @@ def init_db():
             CREATE TABLE IF NOT EXISTS groups
             (
                 id TEXT UNIQUE NOT NULL,
+                name TEXT UNIQUE NOT NULL,
+                description TEXT,
                 creator TEXT,
                 users TEXT,
-                users_num TEXT,
-                perm_link TEXT NOT NULL,
-                temp_link TEXT,
-                public TEXT  
+                usersNum INTEGER,
+                permLink TEXT NOT NULL,
+                tempLink TEXT,
+                public TEXT
             )
             """)
     except BaseException as e:
