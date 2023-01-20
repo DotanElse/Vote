@@ -8,6 +8,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(messa
 
 _POLL_ID_LEN = 11
 _USER_ID_LEN = 6
+_LINK_LEN = 12
+_GROUP_ID_LEN = 5
 
 USER_FIELD = {
     "id": 0,
@@ -68,9 +70,17 @@ def get_random_poll_id():
     characters = string.ascii_lowercase + string.digits
     return "".join(random.choices(characters, k=_POLL_ID_LEN))
 
-def get_random_userId():
+def get_random_user_id():
     characters = string.ascii_lowercase + string.digits
     return "".join(random.choices(characters, k=_USER_ID_LEN))
+
+def get_random_group_id():
+    characters = string.ascii_lowercase + string.digits
+    return "".join(random.choices(characters, k=_GROUP_ID_LEN))
+
+def get_random_perm_link():
+    characters = string.ascii_lowercase + string.digits
+    return "".join(random.choices(characters, k=_LINK_LEN))
     
 def str_to_list(input):
     # Split the input string on commas
