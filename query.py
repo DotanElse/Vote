@@ -293,6 +293,7 @@ def find_vote(id, discussion):
 
 def get_voted(id, polls):
     logging.info("start")
+    logging.info(f"id is {id} and polls are {polls}")
     voted = {}
     poll_id = []
     for poll in polls:
@@ -392,3 +393,19 @@ def pick_poll_option(id, poll_id, optionNumber):
     optionValues = list_to_str(optionValues)
     update_poll_votes(poll_id, optionValues, voted)
     update_discussion_users(id, poll_id, optionNumber)
+
+def poll_view(poll_id, user_id):
+    poll = get_poll(poll_id)
+    if not user_id:
+        if not poll[POLL_FIELD['public']]: #private poll and unknown user
+            return render_template("bad_poll_access.html")
+    user = get_user_by_id(user_id)
+    pollGroup = poll[POLL_FIELD['group_']]
+    userGroups = user[USER_FIELD['groups']]
+    if pollGroup in userGroups: # user can access this poll
+        voteOption = get_voted(user_id, [poll])
+        return render_template("poll.html", id=user_id, poll=poll, voted=voteOption)
+    if poll[POLL_FIELD['public']]: 
+        return render_template("poll.html", id=None, poll=poll, voted=None)
+    
+
