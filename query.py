@@ -118,7 +118,7 @@ def submit_group(creator, name, description, public):
     id = get_random_group_id()
     if id_exists(id, "polls"):
         logging.warning(f"existing group id submittion")
-        return submit_group(creator, description, public)
+        return submit_group(creator, name, description, public)
     permLink = get_random_perm_link()
     try:
         groupConn = sqlite3.connect('groups.db')
@@ -130,10 +130,25 @@ def submit_group(creator, name, description, public):
             {'id': id, 'name': name, 'description': description, 'creator': creator, 'users': creator, 'usersNum': 1,
             'permLink': permLink, 'tempLink': '', 'public': public}
             )
-        return True
     except BaseException as e:
         logging.warning(f"{e} raised, 1")
         return False
+
+    user = get_user_by_id(creator)
+    userGroups = str_to_list(user[USER_FIELD['groups']])
+    userGroups.append(id)
+    userGroups = list_to_str(userGroups)
+    try: 
+        usersConn = sqlite3.connect('users.db')
+        with usersConn:
+            c = usersConn.cursor()
+            # add the poll
+            c.execute("UPDATE users SET groups = ? WHERE id = ?", (userGroups, creator))
+            return True
+    except BaseException as e:
+        logging.warning(f"{e} raised, 2")
+        return False
+    
 
 def submit_poll(creator, title, group, description, optionNames, duration, public):
     id = get_random_poll_id()

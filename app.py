@@ -144,7 +144,7 @@ def process_group_creation():
 def poll_vote(poll_id):
     logging.info("start")
 
-    try:
+    try:  
         verify_jwt_in_request()
         user = get_jwt_identity()
     except BaseException as e:
