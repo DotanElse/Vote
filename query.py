@@ -410,6 +410,8 @@ def pick_poll_option(id, poll_id, optionNumber):
 
 def poll_view(poll_id, user_id):
     poll = get_poll(poll_id)
+    if poll is None or user is None:
+        return render_template("error.html")
     user = get_user_by_id(user_id)
     pollGroup = poll[POLL_FIELD['group_']]
     userGroups = user[USER_FIELD['groups']]
