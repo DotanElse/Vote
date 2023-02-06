@@ -144,7 +144,7 @@ def process_group_creation():
     return render_template('error.html')
 
 @jwt_required
-@app.route('/process_poll_vote/<poll_id>', methods=['POST']) 
+@app.route('/process_poll_vote/<poll_id>', methods=['POST'])
 def poll_vote(poll_id):
     logging.info("start")
 
@@ -168,6 +168,14 @@ def view_poll(poll_id):
     if not verify_jwt_in_request(optional=True):
         return query.poll_view(poll_id, None)
     return query.poll_view(poll_id, get_jwt_identity()['id'])
+
+@app.route('/user/<user_id>')
+def view_user(user_id):
+    logging.info("start")
+    
+    if not verify_jwt_in_request(optional=True):
+        return query.user_view(user_id, None)
+    return query.user_view(user_id, get_jwt_identity()['id'])
 
 if __name__ == '__main__':
     logging.info("Server startup")

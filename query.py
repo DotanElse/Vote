@@ -322,7 +322,6 @@ def find_vote(id, discussion):
 
 def get_voted(id, polls):
     logging.info("start")
-    logging.info(f"id is {id} and polls are {polls}")
     voted = {}
     poll_id = []
     for poll in polls:
@@ -426,6 +425,7 @@ def pick_poll_option(id, poll_id, optionNumber):
 def poll_view(poll_id, user_id):
     poll = get_poll(poll_id)
     user = get_user_by_id(user_id)
+
     if poll is None or user is None:
         return render_template("error.html")
     pollGroup = poll[POLL_FIELD['group_']]
@@ -434,5 +434,13 @@ def poll_view(poll_id, user_id):
         voteOption = get_voted(user_id, [poll])
         return render_template("poll.html", id=user_id, poll=poll, voted=voteOption)
     return render_template("error.html")
-    
 
+def user_view(page_id, user_id):
+    user_requested = get_user_by_id(page_id)
+    user = get_user_by_id(user_id)
+    user = tuple(field for field in user if isinstance(field, str))
+    if user_requested is None:
+        return render_template("error.html")
+    if user[USER_FIELD['id']] == user_requested[USER_FIELD['id']]: #same user
+        return render_template("user.html", user=tuple(user), is_owner=True)
+    return render_template("user.html", user=tuple(user), is_owner=False)
