@@ -118,10 +118,9 @@ def process_poll_creation():
     group = request.form.get('group_').strip()
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
-    public = request.form.get('public').strip()
     duration = request.form.get('duration').strip()
 
-    if query.submit_poll(creator, title, group, description, optionNames, duration, public):
+    if query.submit_poll(creator, title, group, description, optionNames, duration):
         return render_template('index.html')
     
     return render_template('error.html')

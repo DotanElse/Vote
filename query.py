@@ -150,11 +150,11 @@ def submit_group(creator, name, description, public):
         return False
     
 
-def submit_poll(creator, title, group, description, optionNames, duration, public):
+def submit_poll(creator, title, group, description, optionNames, duration):
     id = get_random_poll_id()
     if id_exists(id, "polls"):
         logging.warning(f"existing poll id submittion")
-        return submit_poll(creator, title, group, description, optionNames, duration, public)
+        return submit_poll(creator, title, group, description, optionNames, duration)
     startTime = int(time.time())
     optionAmount = len(str_to_list(optionNames))
     optionValues = ','.join(['0'] * optionAmount)
@@ -165,10 +165,10 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
             c = pollsConn.cursor()
             # add the poll
             c.execute(
-            "INSERT INTO polls VALUES (:id, :startTime, :creator, :title, :group, :description, :optionNames, :optionValues, :idVoted, :duration, :public)",
+            "INSERT INTO polls VALUES (:id, :startTime, :creator, :title, :group, :description, :optionNames, :optionValues, :idVoted, :duration)",
             {'id': id, 'startTime': startTime, 'creator': creator, 'title': title, 'group': group, 
             'description': description, 'optionNames': optionNames, 'optionValues': optionValues, 
-            'idVoted': idVoted, 'duration': duration, 'public': public}
+            'idVoted': idVoted, 'duration': duration}
             )
     except BaseException as e:
         logging.warning(f"{e} raised, 1")
@@ -225,8 +225,7 @@ def init_db():
                 optionNames TEXT NOT NULL,
                 optionValues TEXT NOT NULL,
                 idVoted TEXT NOT NULL,
-                duration TEXT NOT NULL,
-                public TEXT NOT NULL
+                duration TEXT NOT NULL
             )
             """) #group variable refactored into "group_" as group is a keyword in db
     except BaseException as e:
@@ -411,16 +410,12 @@ def pick_poll_option(id, poll_id, optionNumber):
 
 def poll_view(poll_id, user_id):
     poll = get_poll(poll_id)
-    if not user_id:
-        if not poll[POLL_FIELD['public']]: #private poll and unknown user
-            return render_template("bad_poll_access.html")
     user = get_user_by_id(user_id)
     pollGroup = poll[POLL_FIELD['group_']]
     userGroups = user[USER_FIELD['groups']]
     if pollGroup in userGroups: # user can access this poll
         voteOption = get_voted(user_id, [poll])
         return render_template("poll.html", id=user_id, poll=poll, voted=voteOption)
-    if poll[POLL_FIELD['public']]: 
-        return render_template("poll.html", id=None, poll=poll, voted=None)
+    return render_template("error.html")
     
 
