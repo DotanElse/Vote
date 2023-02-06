@@ -48,6 +48,17 @@ def get_user_by_id(id):
         logging.warning(f"{e} raised")
         return None
 
+def get_group(id):
+    try:
+        groupConn = sqlite3.connect('groups.db')
+        with groupConn:
+            c = groupConn.cursor()
+            c.execute("SELECT * FROM groups WHERE id=?", (id,))
+            return c.fetchone()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+
 def get_poll(id):
     try:
         pollsConn = sqlite3.connect('polls.db')
@@ -250,6 +261,11 @@ def init_db():
                 public TEXT
             )
             """)
+            c.execute(
+            "INSERT OR IGNORE INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :tempLink, :public)",
+            {'id': 0, 'name': "Public", 'description': "", 'creator': "0", 'users': "-", 'usersNum': "0",
+            'permLink': "-", 'tempLink': '', 'public': "-"}
+            )
     except BaseException as e:
         logging.warning(f"{e} raised, 3")
         return False
