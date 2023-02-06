@@ -118,10 +118,9 @@ def process_poll_creation():
     group = request.form.get('group_').strip()
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
-    public = request.form.get('public').strip()
     duration = request.form.get('duration').strip()
 
-    if query.submit_poll(creator, title, group, description, optionNames, duration, public):
+    if query.submit_poll(creator, title, group, description, optionNames, duration):
         return render_template('index.html')
     
     return render_template('error.html')
@@ -144,7 +143,7 @@ def process_group_creation():
 def poll_vote(poll_id):
     logging.info("start")
 
-    try:
+    try:  
         verify_jwt_in_request()
         user = get_jwt_identity()
     except BaseException as e:
@@ -156,6 +155,14 @@ def poll_vote(poll_id):
 
     return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {optionNum}", 
     "optionValues": optionValues, "selectedOption": optionNum})
+
+@app.route('/poll/<poll_id>')
+def view_poll(poll_id):
+    logging.info("start")
+
+    if not verify_jwt_in_request(optional=True):
+        return query.poll_view(poll_id, None)
+    return query.poll_view(poll_id, get_jwt_identity()['id'])
 
 if __name__ == '__main__':
     logging.info("Server startup")

@@ -30,7 +30,6 @@ POLL_FIELD = {
     "optionValues": 7,
     "idVoted": 8,
     "duration": 9,
-    "public": 10,
 }
 DISCUSSION_FIELD = {
     "id": 0,

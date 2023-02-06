@@ -118,7 +118,7 @@ def submit_group(creator, name, description, public):
     id = get_random_group_id()
     if id_exists(id, "polls"):
         logging.warning(f"existing group id submittion")
-        return submit_group(creator, description, public)
+        return submit_group(creator, name, description, public)
     permLink = get_random_perm_link()
     try:
         groupConn = sqlite3.connect('groups.db')
@@ -130,16 +130,31 @@ def submit_group(creator, name, description, public):
             {'id': id, 'name': name, 'description': description, 'creator': creator, 'users': creator, 'usersNum': 1,
             'permLink': permLink, 'tempLink': '', 'public': public}
             )
-        return True
     except BaseException as e:
         logging.warning(f"{e} raised, 1")
         return False
 
-def submit_poll(creator, title, group, description, optionNames, duration, public):
+    user = get_user_by_id(creator)
+    userGroups = str_to_list(user[USER_FIELD['groups']])
+    userGroups.append(id)
+    userGroups = list_to_str(userGroups)
+    try: 
+        usersConn = sqlite3.connect('users.db')
+        with usersConn:
+            c = usersConn.cursor()
+            # add the poll
+            c.execute("UPDATE users SET groups = ? WHERE id = ?", (userGroups, creator))
+            return True
+    except BaseException as e:
+        logging.warning(f"{e} raised, 2")
+        return False
+    
+
+def submit_poll(creator, title, group, description, optionNames, duration):
     id = get_random_poll_id()
     if id_exists(id, "polls"):
         logging.warning(f"existing poll id submittion")
-        return submit_poll(creator, title, group, description, optionNames, duration, public)
+        return submit_poll(creator, title, group, description, optionNames, duration)
     startTime = int(time.time())
     optionAmount = len(str_to_list(optionNames))
     optionValues = ','.join(['0'] * optionAmount)
@@ -150,10 +165,10 @@ def submit_poll(creator, title, group, description, optionNames, duration, publi
             c = pollsConn.cursor()
             # add the poll
             c.execute(
-            "INSERT INTO polls VALUES (:id, :startTime, :creator, :title, :group, :description, :optionNames, :optionValues, :idVoted, :duration, :public)",
+            "INSERT INTO polls VALUES (:id, :startTime, :creator, :title, :group, :description, :optionNames, :optionValues, :idVoted, :duration)",
             {'id': id, 'startTime': startTime, 'creator': creator, 'title': title, 'group': group, 
             'description': description, 'optionNames': optionNames, 'optionValues': optionValues, 
-            'idVoted': idVoted, 'duration': duration, 'public': public}
+            'idVoted': idVoted, 'duration': duration}
             )
     except BaseException as e:
         logging.warning(f"{e} raised, 1")
@@ -210,8 +225,7 @@ def init_db():
                 optionNames TEXT NOT NULL,
                 optionValues TEXT NOT NULL,
                 idVoted TEXT NOT NULL,
-                duration TEXT NOT NULL,
-                public TEXT NOT NULL
+                duration TEXT NOT NULL
             )
             """) #group variable refactored into "group_" as group is a keyword in db
     except BaseException as e:
@@ -293,6 +307,7 @@ def find_vote(id, discussion):
 
 def get_voted(id, polls):
     logging.info("start")
+    logging.info(f"id is {id} and polls are {polls}")
     voted = {}
     poll_id = []
     for poll in polls:
@@ -392,3 +407,17 @@ def pick_poll_option(id, poll_id, optionNumber):
     optionValues = list_to_str(optionValues)
     update_poll_votes(poll_id, optionValues, voted)
     update_discussion_users(id, poll_id, optionNumber)
+
+def poll_view(poll_id, user_id):
+    poll = get_poll(poll_id)
+    if poll is None or user is None:
+        return render_template("error.html")
+    user = get_user_by_id(user_id)
+    pollGroup = poll[POLL_FIELD['group_']]
+    userGroups = user[USER_FIELD['groups']]
+    if pollGroup in userGroups: # user can access this poll
+        voteOption = get_voted(user_id, [poll])
+        return render_template("poll.html", id=user_id, poll=poll, voted=voteOption)
+    return render_template("error.html")
+    
+

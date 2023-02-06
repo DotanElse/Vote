@@ -15,10 +15,6 @@
         <input type="hidden" name="creator" value="{{ email }}">
         <label for="optionNames">Options:</label><br>
         <input type="text" id="optionNames" name="optionNames" required><br><br>
-        <select name="public" id="public" required>
-          <option selected>Public</option>
-          <option>Private</option>
-        </select><br><br>
         <label for="duration">Duration(Days):</label><br>
         <input name="duration" id="duration" type="range" min="1" max="7" step="1" value="1" oninput="this.nextElementSibling.value = this.value">
         <output>1</output>
