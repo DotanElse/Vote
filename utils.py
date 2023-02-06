@@ -31,6 +31,17 @@ POLL_FIELD = {
     "idVoted": 8,
     "duration": 9,
 }
+GROUP_FIELD = {
+    "id": 0,
+    "name": 1,
+    "description": 2,
+    "creator": 3,
+    "users": 4,
+    "usersNum": 5,
+    "permLink": 6,
+    "tempLink": 7,
+    "public": 8,
+}
 DISCUSSION_FIELD = {
     "id": 0,
     "o1": 1,

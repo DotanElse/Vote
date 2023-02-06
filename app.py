@@ -41,8 +41,13 @@ def create_poll():
     token = request.cookies.get('access_token_cookie')
     verify_jwt_in_request()
     user = get_jwt_identity()
-
-    return render_template('create_poll.html', groups=user['groups'], email=user['email'])
+    groups_id = utils.str_to_list(user['groups'])
+    groups = []
+    for id in groups_id:
+        group = query.get_group(id)
+        group_name = group[utils.GROUP_FIELD['name']]
+        groups.append(group_name)
+    return render_template('create_poll.html', groups=utils.list_to_str(groups), email=user['email'])
 
 @jwt_required
 @app.route('/create_group')
