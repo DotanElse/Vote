@@ -164,17 +164,23 @@ def poll_vote(poll_id):
 @app.route('/poll/<poll_id>')
 def view_poll(poll_id):
     logging.info("start")
-
-    if not verify_jwt_in_request(optional=True):
+    try:
+        verify_jwt_in_request()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
         return query.poll_view(poll_id, None)
+
     return query.poll_view(poll_id, get_jwt_identity()['id'])
 
 @app.route('/user/<user_id>')
 def view_user(user_id):
     logging.info("start")
-    
-    if not verify_jwt_in_request(optional=True):
+    try:
+        verify_jwt_in_request()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
         return query.user_view(user_id, None)
+
     return query.user_view(user_id, get_jwt_identity()['id'])
 
 if __name__ == '__main__':

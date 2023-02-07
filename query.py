@@ -44,6 +44,7 @@ def get_user_by_id(id):
             c.execute("SELECT * FROM users WHERE id=?", (id,))
             return c.fetchone()
     except BaseException as e:
+        logging.info("exception in this shit")
         logging.warning(f"{e} raised")
         return None
 
@@ -437,10 +438,19 @@ def poll_view(poll_id, user_id):
 
 def user_view(page_id, user_id):
     user_requested = get_user_by_id(page_id)
+    logging.info(f"user requested is {user_requested}")
+    if user_requested is None:
+        return render_template("error.html")
+    user_requested = tuple(field for field in user_requested if isinstance(field, str))
+            
     user = get_user_by_id(user_id)
-    user = tuple(field for field in user if isinstance(field, str))
+    if user is None:
+        return render_template("user.html", user=tuple(user_requested), is_owner=False)
+    for field in user_requested:
+        logging.info(type(field))
     if user_requested is None:
         return render_template("error.html")
     if user[USER_FIELD['id']] == user_requested[USER_FIELD['id']]: #same user
-        return render_template("user.html", user=tuple(user), is_owner=True)
-    return render_template("user.html", user=tuple(user), is_owner=False)
+        return render_template("user.html", user=tuple(user_requested), is_owner=True)
+    return render_template("user.html", user=tuple(user_requested), is_owner=False)
+    # TODO - check the user being printed is one requested and check viewing without token
