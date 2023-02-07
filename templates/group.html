@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>User Page</title>
+    <script src="../static/group.js" defer></script>
+  </head>
+  <body>
+    <div class="user_container">
+      <h2>Title for user page</h2>
+    </div>
+    <div id="user_details"></div>
+  </body>
+  <script type="text/javascript">
+    user = JSON.parse('{{user|tojson|safe}}')
+    group = JSON.parse('{{group|tojson|safe}}')
+    admin = JSON.parse('{{admin|tojson|safe}}')
+    extended = JSON.parse('{{extended|tojson|safe}}')
+  </script>
+</html>

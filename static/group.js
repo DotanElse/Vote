@@ -1,0 +1,5 @@
+console.log("-Group page-")
+console.log(group)
+console.log(user)
+console.log(admin)
+console.log(extended)

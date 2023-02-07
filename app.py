@@ -183,6 +183,17 @@ def view_user(user_id):
 
     return query.user_view(user_id, get_jwt_identity()['id'])
 
+@app.route('/group/<group_id>')
+def view_group(group_id):
+    logging.info("start")
+    try:
+        verify_jwt_in_request()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return query.group_view(group_id, None)
+
+    return query.group_view(group_id, get_jwt_identity()['id'])
+
 if __name__ == '__main__':
     logging.info("Server startup")
     assert query.init_db() == True

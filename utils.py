@@ -110,3 +110,7 @@ def encrypt(input : str):
 def check_password(password, hashed):
     logging.info("start")
     return bcrypt.checkpw(str.encode(password), hashed)
+
+def remove_password_field(user):
+    # only password is in byte form, sending it over to frontend
+    return tuple(field for field in user if isinstance(field, str))

@@ -5,9 +5,9 @@ import logging
 from flask import Flask, render_template
 from utils import (
     get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
-    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, 
+    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD,
     str_to_list, list_to_str,
-    check_password
+    check_password, remove_password_field,
 )
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
@@ -441,7 +441,7 @@ def user_view(page_id, user_id):
     logging.info(f"user requested is {user_requested}")
     if user_requested is None:
         return render_template("error.html")
-    user_requested = tuple(field for field in user_requested if isinstance(field, str))
+    user_requested = remove_password_field(user_requested)
             
     user = get_user_by_id(user_id)
     if user is None:
@@ -454,3 +454,18 @@ def user_view(page_id, user_id):
         return render_template("user.html", user=tuple(user_requested), is_owner=True)
     return render_template("user.html", user=tuple(user_requested), is_owner=False)
     # TODO - check the user being printed is one requested and check viewing without token
+
+def group_view(group_id, user_id):
+    group = get_group(group_id)
+    if group is None:
+        return render_template("error.html")
+    user = get_user_by_id(user_id)
+
+    if user is None:
+        return render_template("group.html", group=group, user=None, admin=False, extended=False)
+    userGroups = user[USER_FIELD['groups']]
+    if group[GROUP_FIELD['id']] in userGroups: # user is part of this group
+        if user[USER_FIELD['id']] in group[GROUP_FIELD['creator']]: # user is an admin
+            return render_template("poll.html", group=group, user=remove_password_field(user), admin=True, extended=True)
+        return render_template("poll.html", group=group, user=remove_password_field(user), admin=False, extended=True)
+    return render_template("poll.html", group=group, user=remove_password_field(user), admin=False, extended=False)
