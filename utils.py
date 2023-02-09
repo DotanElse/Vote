@@ -4,7 +4,7 @@ import string
 import logging
 import bcrypt
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
 _POLL_ID_LEN = 11
 _USER_ID_LEN = 6

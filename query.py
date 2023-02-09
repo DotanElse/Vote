@@ -10,7 +10,7 @@ from utils import (
     check_password, remove_password_field,
 )
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
 def authorize_user(email, password):
     logging.info("start")
@@ -475,8 +475,9 @@ def group_view(group_id, user_id):
     if user is None:
         return render_template("group.html", group=group, user=None, admin=False, extended=False)
     userGroups = user[USER_FIELD['groups']]
+    logging.info(f"requested group id is: {group[GROUP_FIELD['id']]}, user groups are {userGroups}")
     if group[GROUP_FIELD['id']] in userGroups: # user is part of this group
         if user[USER_FIELD['id']] in group[GROUP_FIELD['creator']]: # user is an admin
-            return render_template("poll.html", group=group, user=remove_password_field(user), admin=True, extended=True)
-        return render_template("poll.html", group=group, user=remove_password_field(user), admin=False, extended=True)
-    return render_template("poll.html", group=group, user=remove_password_field(user), admin=False, extended=False)
+            return render_template("group.html", group=group, user=remove_password_field(user), admin=True, extended=True)
+        return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=True)
+    return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=False)

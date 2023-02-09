@@ -12,7 +12,7 @@ function group_dropdown(groups)
     // create options
     for (var i = 0; i < choices.length; i++) {
       var option = document.createElement('option');
-      option.value = choices[i].toLowerCase();
+      option.value = choices[i];
       option.text = choices[i];
       select.appendChild(option);
     }

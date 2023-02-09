@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 import utils
 import query
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
 app = Flask(__name__)
 
@@ -121,7 +121,9 @@ def process_poll_creation():
     creator = request.form.get('creator').strip()
     title = request.form.get('title').strip()
     group_name = request.form.get('group_').strip() # this is the group name that the user chose
+    logging.info(f"group name is {group_name}")
     group_id = query.get_group_id(group_name)
+    logging.info(f"group id is {group_id}")
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
     duration = request.form.get('duration').strip()
