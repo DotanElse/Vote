@@ -59,6 +59,17 @@ def get_group(id):
         logging.warning(f"{e} raised")
         return None
 
+def get_group_id(name):
+    try:
+        groupConn = sqlite3.connect('groups.db')
+        with groupConn:
+            c = groupConn.cursor()
+            c.execute("SELECT * FROM groups WHERE name=?", (name,))
+            return c.fetchone()[GROUP_FIELD['id']]
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+
 def get_poll(id):
     try:
         pollsConn = sqlite3.connect('polls.db')

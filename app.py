@@ -120,12 +120,13 @@ def process_poll_creation():
     
     creator = request.form.get('creator').strip()
     title = request.form.get('title').strip()
-    group = request.form.get('group_').strip()
+    group_name = request.form.get('group_').strip() # this is the group name that the user chose
+    group_id = query.get_group_id(group_name)
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
     duration = request.form.get('duration').strip()
 
-    if query.submit_poll(creator, title, group, description, optionNames, duration):
+    if query.submit_poll(creator, title, group_id, description, optionNames, duration):
         return render_template('index.html')
     
     return render_template('error.html')
