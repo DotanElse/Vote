@@ -334,6 +334,24 @@ def init_db():
     except BaseException as e:
         logging.warning(f"{e} raised, 4")
         return False
+    try:
+        notificationsConn = sqlite3.connect('notifications.db')
+        with notificationsConn:
+            c = notificationsConn.cursor()
+            # create the db if does not exist, maybe move to different function
+            c.execute("""
+            CREATE TABLE IF NOT EXISTS notifications 
+            (
+                id TEXT NOT NULL,
+                time TEXT NOT NULL,
+                category TEXT NOT NULL,
+                initiator TEXT NOT NULL,
+                group_ TEXT NOT NULL
+            )
+            """)
+    except BaseException as e:
+        logging.warning(f"{e} raised, 5")
+        return False
     return True
 
 def find_vote(id, discussion):
@@ -523,12 +541,24 @@ def user_in_invite_list(user_id, group_id):
         return True
     return False
 
+def add_notification(id, category, initiator, group):
+    start_time = int(time.time())
+    try:
+        notificationsConn = sqlite3.connect('notifications.db')
+        with notificationsConn:
+            c = notificationsConn.cursor()
+            c.execute("INSERT INTO notifications VALUES (:id, :time, :category, :initiator, :group)",
+            {'id': id, 'time': start_time, 'category': category, 'initiator': initiator, 'group': group})
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return False
+
 def invite_users(admin_id, group_id, user_id_list):
     logging.info("start")
     group = get_group(group_id)
     group_invited = str_to_list(group[GROUP_FIELD['invited']])
     for id in user_id_list:
-        # TODO - add to notification list
+        add_notification(id, 'invitation', admin_id, group_id)
         group_invited.append(id)
     group_invited = list_to_str(group_invited)
     update_field("groups", group_id, "invited", group_invited)

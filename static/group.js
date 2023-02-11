@@ -37,8 +37,7 @@ if(extended)
   extendedInfo.appendChild(info);
 }
 
-if (admin) // only admin can invite users
-{
+if (admin) { // only admin can invite users
   const container = document.createElement("div");
   container.style.display = "flex";
   container.style.alignItems = "center";
@@ -68,7 +67,19 @@ if (admin) // only admin can invite users
     buttonsContainer.appendChild(button);
   }
 
-  // Add a click event listener to the submit button
+  searchInput.addEventListener("input", function() {
+    const inputValue = this.value.toLowerCase();
+    const buttons = buttonsContainer.querySelectorAll(".button");
+    for (const button of buttons) {
+      const buttonText = button.textContent.toLowerCase();
+      if (buttonText.includes(inputValue)) {
+        button.style.display = "block";
+      } else {
+        button.style.display = "none";
+      }
+    }
+  });
+
   submitButton.addEventListener("click", function() {
     // Get the list of selected buttons
     const selectedButtons = document.querySelectorAll(".selected");
@@ -79,38 +90,22 @@ if (admin) // only admin can invite users
 
     // Send the list of selected buttons to the Flask function
     const formData = JSON.stringify({ ids: selectedIds });
+
+    fetch(`/process_group_invite/${group[GROUP_FIELD['id']]}`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.message);
+        const selectedButtons = document.querySelectorAll(".selected");
+        for (const button of selectedButtons) {
+          button.remove();
+        }
+      });
   });
-
-  // Add a input event listener to the search input
-  searchInput.addEventListener("input", function() {
-    const searchTerm = this.value.toLowerCase();
-    const buttons = document.querySelectorAll(".button");
-    for (let button of buttons) {
-      if (button.textContent.toLowerCase().includes(searchTerm)) {
-        button.style.display = "block";
-      } else {
-        button.style.display = "none";
-      }
-    }
-  });
-
-  // get the list of selected buttons to the Flask function
-  const formData = JSON.stringify({ ids: selectedIds });
-
-  fetch(`/process_group_invite/${group[GROUP_FIELD['id']]}`, {
-    method: "POST",
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: formData
-  })
-    .then(response => response.json())
-    .then(data => {
-      console.log(data.message);
-      const selectedButtons = document.querySelectorAll(".selected");
-      for (const button of selectedButtons) {
-        button.remove();
-      }
-    });
-};
+}
