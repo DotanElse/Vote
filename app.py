@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import Flask, render_template, request, make_response, jsonify
@@ -163,6 +164,23 @@ def poll_vote(poll_id):
 
     return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {optionNum}", 
     "optionValues": optionValues, "selectedOption": optionNum})
+
+@jwt_required
+@app.route('/process_group_invite/<group_id>', methods=['POST'])
+def admin_group_invite(group_id):
+    logging.info("start")
+    data = json.loads(request.data)
+    selected_ids = data["ids"]
+    logging.info(f"sel ids are {selected_ids} with group {group_id}")
+    try:
+        verify_jwt_in_request()
+        user = get_jwt_identity()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+    
+    query.invite_users(user['id'], group_id, selected_ids)
+    return jsonify({"message": f"id {user['id']} invited {selected_ids} to {group_id}"})
+
 
 @app.route('/poll/<poll_id>')
 def view_poll(poll_id):

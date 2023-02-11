@@ -39,7 +39,7 @@ GROUP_FIELD = {
     "users": 4,
     "usersNum": 5,
     "permLink": 6,
-    "tempLink": 7,
+    "invited": 7,
     "public": 8,
 }
 DISCUSSION_FIELD = {

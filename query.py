@@ -12,6 +12,17 @@ from utils import (
 
 logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
+def update_field(db, id, field, value):
+    logging.info(f"start, {db}, {field}, {value}")
+    try:
+        conn = sqlite3.connect(f'{db}.db')
+        with conn:
+            c = conn.cursor()
+            c.execute(f"UPDATE {db} SET {field} = ? WHERE id = ?", (value, id))
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return False
+
 def authorize_user(email, password):
     logging.info("start")
 
@@ -44,7 +55,6 @@ def get_user_by_id(id):
             c.execute("SELECT * FROM users WHERE id=?", (id,))
             return c.fetchone()
     except BaseException as e:
-        logging.info("exception in this shit")
         logging.warning(f"{e} raised")
         return None
 
@@ -148,9 +158,9 @@ def submit_group(creator, name, description, public):
             c = groupConn.cursor()
             # add the poll
             c.execute(
-            "INSERT INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :tempLink, :public)",
+            "INSERT INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :invited, :public)",
             {'id': id, 'name': name, 'description': description, 'creator': creator, 'users': creator, 'usersNum': 1,
-            'permLink': permLink, 'tempLink': '', 'public': public}
+            'permLink': permLink, 'invited': '', 'public': public}
             )
     except BaseException as e:
         logging.warning(f"{e} raised, 1")
@@ -268,14 +278,14 @@ def init_db():
                 users TEXT,
                 usersNum INTEGER,
                 permLink TEXT NOT NULL,
-                tempLink TEXT,
+                invited TEXT,
                 public TEXT
             )
             """)
             c.execute(
-            "INSERT OR IGNORE INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :tempLink, :public)",
+            "INSERT OR IGNORE INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :invited, :public)",
             {'id': 0, 'name': "Public", 'description': "", 'creator': "0", 'users': "-", 'usersNum': "0",
-            'permLink': "-", 'tempLink': '', 'public': "-"}
+            'permLink': "-", 'invited': '', 'public': "-"}
             )
     except BaseException as e:
         logging.warning(f"{e} raised, 3")
@@ -449,7 +459,6 @@ def poll_view(poll_id, user_id):
 
 def user_view(page_id, user_id):
     user_requested = get_user_by_id(page_id)
-    logging.info(f"user requested is {user_requested}")
     if user_requested is None:
         return render_template("error.html")
     user_requested = remove_password_field(user_requested)
@@ -457,14 +466,33 @@ def user_view(page_id, user_id):
     user = get_user_by_id(user_id)
     if user is None:
         return render_template("user.html", user=tuple(user_requested), is_owner=False)
-    for field in user_requested:
-        logging.info(type(field))
     if user_requested is None:
         return render_template("error.html")
     if user[USER_FIELD['id']] == user_requested[USER_FIELD['id']]: #same user
         return render_template("user.html", user=tuple(user_requested), is_owner=True)
     return render_template("user.html", user=tuple(user_requested), is_owner=False)
     # TODO - check the user being printed is one requested and check viewing without token
+
+def get_uninvited_users(group_id):
+    # get all users
+    users = []
+    try:
+        usersConn = sqlite3.connect('users.db')
+        with usersConn:
+            c = usersConn.cursor()
+            c.execute("SELECT * FROM users")
+            users = c.fetchall()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+
+    # remove the users that are in the group or in the invite list
+    uninvited_users = []
+    for user in users:
+        if not user_in_group(user[USER_FIELD['id']], group_id) and not user_in_invite_list(user[USER_FIELD['id']], group_id):
+            uninvited_users.append(user)
+    uninvited_dict = {user[USER_FIELD['id']]: user[USER_FIELD['name']] for user in uninvited_users}
+    return uninvited_dict
 
 def group_view(group_id, user_id):
     group = get_group(group_id)
@@ -473,11 +501,34 @@ def group_view(group_id, user_id):
     user = get_user_by_id(user_id)
 
     if user is None:
-        return render_template("group.html", group=group, user=None, admin=False, extended=False)
+        return render_template("group.html", group=group, user=None, admin=False, extended=False, users=None)
     userGroups = user[USER_FIELD['groups']]
-    logging.info(f"requested group id is: {group[GROUP_FIELD['id']]}, user groups are {userGroups}")
     if group[GROUP_FIELD['id']] in userGroups: # user is part of this group
         if user[USER_FIELD['id']] in group[GROUP_FIELD['creator']]: # user is an admin
-            return render_template("group.html", group=group, user=remove_password_field(user), admin=True, extended=True)
-        return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=True)
-    return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=False)
+            return render_template("group.html", group=group, user=remove_password_field(user), admin=True, extended=True, users=get_uninvited_users(group_id))
+        return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=True, users=None)
+    return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=False, users=None)
+
+def user_in_group(user_id, group_id):
+    user = get_user_by_id(user_id)
+    user_groups = str_to_list(user[USER_FIELD['groups']])
+    if group_id in user_groups:
+        return True
+    return False
+
+def user_in_invite_list(user_id, group_id):
+    group = get_group(group_id)
+    group_invite = str_to_list(group[GROUP_FIELD['invited']])
+    if user_id in group_invite:
+        return True
+    return False
+
+def invite_users(admin_id, group_id, user_id_list):
+    logging.info("start")
+    group = get_group(group_id)
+    group_invited = str_to_list(group[GROUP_FIELD['invited']])
+    for id in user_id_list:
+        # TODO - add to notification list
+        group_invited.append(id)
+    group_invited = list_to_str(group_invited)
+    update_field("groups", group_id, "invited", group_invited)
