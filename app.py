@@ -97,7 +97,7 @@ def process_login_form():
     accessToken = create_jwt_access_token(user)
     voted = query.get_voted(id, polls)
 
-    resp = make_response(render_template('main_page.html', id=id, polls=polls, voted=voted))
+    resp = make_response(render_template('main_page.html', id=id, polls=polls, voted=voted, notifications=query.get_user_notifications(id)))
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     

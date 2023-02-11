@@ -1,5 +1,6 @@
 console.log("-Main page-")
 console.log(voted)
+console.log(notifications)
 poll_view(polls)
 submit_poll_option()
 

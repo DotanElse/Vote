@@ -512,6 +512,17 @@ def get_uninvited_users(group_id):
     uninvited_dict = {user[USER_FIELD['id']]: user[USER_FIELD['name']] for user in uninvited_users}
     return uninvited_dict
 
+def get_user_notifications(user_id):
+    try:
+        usersConn = sqlite3.connect('notifications.db')
+        with usersConn:
+            c = usersConn.cursor()
+            c.execute("SELECT * FROM notifications WHERE id=?", (user_id,))
+            return c.fetchall()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+
 def group_view(group_id, user_id):
     group = get_group(group_id)
     if group is None:
