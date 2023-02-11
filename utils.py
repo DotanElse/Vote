@@ -4,7 +4,7 @@ import string
 import logging
 import bcrypt
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
 _POLL_ID_LEN = 11
 _USER_ID_LEN = 6
@@ -39,7 +39,7 @@ GROUP_FIELD = {
     "users": 4,
     "usersNum": 5,
     "permLink": 6,
-    "tempLink": 7,
+    "invited": 7,
     "public": 8,
 }
 DISCUSSION_FIELD = {
@@ -110,3 +110,7 @@ def encrypt(input : str):
 def check_password(password, hashed):
     logging.info("start")
     return bcrypt.checkpw(str.encode(password), hashed)
+
+def remove_password_field(user):
+    # only password is in byte form, sending it over to frontend
+    return tuple(field for field in user if isinstance(field, str))

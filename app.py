@@ -1,3 +1,4 @@
+import json
 import logging
 
 from flask import Flask, render_template, request, make_response, jsonify
@@ -7,7 +8,7 @@ from datetime import datetime, timedelta
 import utils
 import query
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s:%(funcName)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
 app = Flask(__name__)
 
@@ -120,12 +121,15 @@ def process_poll_creation():
     
     creator = request.form.get('creator').strip()
     title = request.form.get('title').strip()
-    group = request.form.get('group_').strip()
+    group_name = request.form.get('group_').strip() # this is the group name that the user chose
+    logging.info(f"group name is {group_name}")
+    group_id = query.get_group_id(group_name)
+    logging.info(f"group id is {group_id}")
     description = request.form.get('description').strip()
     optionNames = request.form.get('optionNames').strip()
     duration = request.form.get('duration').strip()
 
-    if query.submit_poll(creator, title, group, description, optionNames, duration):
+    if query.submit_poll(creator, title, group_id, description, optionNames, duration):
         return render_template('index.html')
     
     return render_template('error.html')
@@ -161,6 +165,23 @@ def poll_vote(poll_id):
     return jsonify({"message": f"id {user['id']} voting on poll {poll_id} for option num {optionNum}", 
     "optionValues": optionValues, "selectedOption": optionNum})
 
+@jwt_required
+@app.route('/process_group_invite/<group_id>', methods=['POST'])
+def admin_group_invite(group_id):
+    logging.info("start")
+    data = json.loads(request.data)
+    selected_ids = data["ids"]
+    logging.info(f"sel ids are {selected_ids} with group {group_id}")
+    try:
+        verify_jwt_in_request()
+        user = get_jwt_identity()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+    
+    query.invite_users(user['id'], group_id, selected_ids)
+    return jsonify({"message": f"id {user['id']} invited {selected_ids} to {group_id}"})
+
+
 @app.route('/poll/<poll_id>')
 def view_poll(poll_id):
     logging.info("start")
@@ -182,6 +203,17 @@ def view_user(user_id):
         return query.user_view(user_id, None)
 
     return query.user_view(user_id, get_jwt_identity()['id'])
+
+@app.route('/group/<group_id>')
+def view_group(group_id):
+    logging.info("start")
+    try:
+        verify_jwt_in_request()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return query.group_view(group_id, None)
+
+    return query.group_view(group_id, get_jwt_identity()['id'])
 
 if __name__ == '__main__':
     logging.info("Server startup")
