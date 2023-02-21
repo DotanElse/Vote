@@ -10,7 +10,7 @@ import query
 
 logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 app.config['JWT_SECRET_KEY'] = 'super-secret-vote'
 app.config["JWT_TOKEN_LOCATION"] = ['cookies']
@@ -94,10 +94,15 @@ def process_login_form():
     user, polls = query.get_user_and_polls(email)
 
     id = query.get_user_by_email(email)[utils.USER_FIELD['id']]
+    username = query.get_user_by_email(email)[utils.USER_FIELD['name']]
+    groups_id = utils.str_to_list(query.get_user_by_email(email)[utils.USER_FIELD['groups']])
+    groups = query.get_group_dict(groups_id)
+    logging.info(f"groups dict is {groups}")
+
     accessToken = create_jwt_access_token(user)
     voted = query.get_voted(id, polls)
 
-    resp = make_response(render_template('main_page.html', id=id, polls=polls, voted=voted, notifications=query.get_user_notifications(id)))
+    resp = make_response(render_template('main_page.html', id=id, username=username, groups=groups, polls=polls, voted=voted, notifications=query.get_user_notifications(id)))
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     

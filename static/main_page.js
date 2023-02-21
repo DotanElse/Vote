@@ -1,13 +1,31 @@
 console.log("-Main page-")
+console.log(id)
+console.log(username)
+console.log(groups)
 console.log(voted)
 console.log(notifications)
+
+POLL_FIELD = {
+    "id": 0,
+    "startTime": 1,
+    "creator": 2,
+    "title": 3,
+    "group": 4,
+    "description": 5,
+    "optionNames": 6,
+    "optionValues": 7,
+    "idVoted": 8,
+    "duration": 9,
+}
+
 poll_view(polls)
 submit_poll_option()
+show_groups()
 
 function poll_view(polls)
 {
     // get the select element
-    var select = document.getElementById('form_wrapper');
+    var select = document.getElementById('votes-wrapper');
   
     // create forms
     for (var i = 0; i < polls.length; i++)
@@ -183,7 +201,70 @@ function submit_poll_option()
                 console.log(data.message);
                 voted_for_poll(form.id, data.optionValues, data.selectedOption); 
             });
-
         });
     });
+}
+
+function show_all_groups()
+{
+    for (var i in polls){
+        const curr_poll_id = polls[i][POLL_FIELD['id']]
+        const curr_poll_element = document.getElementById(curr_poll_id);
+        curr_poll_element.style.display = "block";
+    }
+}
+
+function filter_groups(id)
+{
+    console.log(id)
+    for (var i in polls){
+        const curr_poll_id = polls[i][POLL_FIELD['id']]
+        const curr_poll_element = document.getElementById(curr_poll_id);
+        if(polls[i][POLL_FIELD['group']] == id)
+        {
+            curr_poll_element.style.display = "block";
+        }
+        else 
+        {
+            curr_poll_element.style.display = "none";
+        }
+    }
+}
+
+
+function show_groups()
+{
+    // get the select element
+    var select = document.getElementById('groups-wrapper');
+
+    // create the "explore" button, which shows all polls
+    const all_groups_button = document.createElement("button");
+    all_groups_button.innerHTML = "Explore";
+    all_groups_button.id = "explore-button"
+    all_groups_button.className = "group-button";
+    all_groups_button.onclick = function() { show_all_groups(); };
+    select.appendChild(all_groups_button)
+
+    // create group buttons
+    for (var id in groups){
+        console.log(id, groups[id]);
+
+        const button = document.createElement("button");
+        button.innerHTML = groups[id];
+        button.id = id
+        button.className = "group-button";
+        button.onclick = function() { filter_groups(button.id); };
+        // button.onclick = filter_groups(button)
+        select.appendChild(button);
+      }
+
+      // create "add new group" button
+      const new_group_button = document.createElement("button");
+      new_group_button.innerHTML = "+";
+      new_group_button.id = "new-group-button"
+      new_group_button.className = "group-button";
+      new_group_button.onclick = function () {
+        location.href = create_poll_url;
+    };
+      select.appendChild(new_group_button)
 }

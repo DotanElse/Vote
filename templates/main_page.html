@@ -2,85 +2,65 @@
   <head>
     <meta charset="utf-8">
     <title>Home</title>
+    <link rel="stylesheet" href="../static/styles/main.css">
     <script src="../static/main_page.js" defer></script>
-    <style>
-      .radar-form {
-        width: 650px;
-        margin: 10 auto;
-        text-align: left;
-        font-family: sans-serif;
-        border: 2px solid #000;
-        border-radius: 25px;
-        padding: 20px;
-        padding-top: 10px
-      }
-      .radar-form h1 {
-        color: #333;
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-      .radar-form p {
-        color: #666;
-        font-size: 24px;
-      }
-      .radar-form .option {
-        display: flex;
-        align-items: center;
-        flex-direction: row-reverse;
-        border-top: 1px solid #000;
-      }
-      .radar-form .option-description {
-        flex: 1;
-        margin-left: 10px;
-        color: #666;
-        font-size: 16px;
-      }
-      .radar-form input[type="radio"] {
-        display: none;
-      }
-      .radar-form label {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 2px solid #666;
-        border-radius: 50%;
-        position: relative;
-        cursor: pointer;
-      }
-      .radar-form input[type="radio"]:checked + label {
-        border: 2px solid #333;
-        background: #333;
-      }
-      .radar-form .btn {
-        display: block;      
-        width: 150px;
-        margin: 0 auto;
-        padding: 10px 20px;
-        border: none;
-        background: #333;
-        color: #fff;
-        font-size: 16px;
-        cursor: pointer;
-        border-radius: 4px;
-        margin-top: 20px;
-      }
-      .radar-form .btn:hover {
-        background: #666;
-      }
-    </style>
   </head>
   <body>
-    <div class="title_container">
+    <!-- <div class="title_container">
       <h2>Attributes and main feed of site</h2>
     </div>
     <a href="{{url_for('create_poll')}}"><button id="create_poll_button">Create New Form</button></a>
     <a href="{{url_for('create_group')}}"><button id="create_group_button">Create New Group</button></a>
-    <div id="form_wrapper"></div>
+    <div id="votes-wrapper"></div> -->
+    <div id="menu">
+      <div class="left">
+      <div id="nested-left">
+        <div id="profile-pic">USER PIC WILL BE HERE</div>
+        <div id="username-plate"> {{ username }}</div>
+        <div id="logout">
+        <img src="./static/img/logout-icon.png" alt="logout icon">
+        </div>
+      </div>
+      </div>
+      <div class="middle">
+      <div id="nested-middle">
+        <div id="new-vote-icon">
+          <a href="{{url_for('create_poll')}}"><img src="./static/img/new-vote-icon.png" alt="New vote icon"></a>
+        </div>
+        <div id="search-bar"></div>
+        <div id="search-bar-icon">
+        <img src="./static/img/search-icon.png" alt="Search bar icon">
+        </div>
+      </div>
+      </div>
+      <div class="right">
+      <div id="nested-right">
+        <div id="vote-icon">
+        <img src="./static/img/vote-icon.png" alt="Vote logo">
+        </div>
+      </div>
+      </div>
+    </div>
+    <div id="main">
+      <div class="left">
+        <div id="groups-wrapper"></div>
+      </div>
+      <div class="middle">
+        <div id="votes-wrapper"></div>
+      </div>
+      <div class="right">
+        <div id="notifications-wrapper"></div>
+      </div>
+    </div>
+
   </body>
   <script type="text/javascript">
     id = JSON.parse('{{id|tojson|safe}}')
+    username = JSON.parse('{{username|tojson|safe}}')
+    groups = JSON.parse('{{groups|tojson|safe}}')
     polls = JSON.parse('{{polls|tojson|safe}}')
     voted = JSON.parse('{{voted|tojson|safe}}')
     notifications = JSON.parse('{{notifications|tojson|safe}}')
+    create_poll_url = "{{url_for('create_group')}}"
   </script>
 </html>
