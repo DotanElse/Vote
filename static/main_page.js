@@ -18,9 +18,20 @@ POLL_FIELD = {
     "duration": 9,
 }
 
+NOTIFICATIONS_FIELD = {
+    "id": 0,
+    "time": 1,
+    "category": 2,
+    "initiator": 3,
+    "group": 4,
+    "initiator_name": 5,
+    "group_name": 6,
+}
+
 poll_view(polls)
 submit_poll_option()
 show_groups()
+show_notifications()
 
 function poll_view(polls)
 {
@@ -254,17 +265,94 @@ function show_groups()
         button.id = id
         button.className = "group-button";
         button.onclick = function() { filter_groups(button.id); };
-        // button.onclick = filter_groups(button)
         select.appendChild(button);
-      }
+    }
 
-      // create "add new group" button
-      const new_group_button = document.createElement("button");
-      new_group_button.innerHTML = "+";
-      new_group_button.id = "new-group-button"
-      new_group_button.className = "group-button";
-      new_group_button.onclick = function () {
-        location.href = create_poll_url;
+    // create "add new group" button
+    const new_group_button = document.createElement("button");
+    new_group_button.innerHTML = "+";
+    new_group_button.id = "new-group-button"
+    new_group_button.className = "group-button";
+    new_group_button.onclick = function () {
+    location.href = create_poll_url;
     };
-      select.appendChild(new_group_button)
+    select.appendChild(new_group_button)
+}
+
+function create_link(id, name, type) {
+    // Create a new anchor element
+    const link = document.createElement("a");
+  
+    // Set the href attribute to the Flask route with the given ID
+    link.href = `/${type}/${id}`;
+  
+    // Set the text content of the anchor element
+    link.textContent = `${name}`;
+  
+    // Return the anchor element
+    return link;
+  }
+
+function create_notification_msg_element(notification)
+{
+    group_link = create_link(notification[NOTIFICATIONS_FIELD['group']], notification[NOTIFICATIONS_FIELD["group_name"]], "group")
+    user_link = create_link(notification[NOTIFICATIONS_FIELD['initiator']], notification[NOTIFICATIONS_FIELD["initiator_name"]], "user")
+    // Combine the elements into a single string
+    var combinedString = ""
+    console.log(notification[NOTIFICATIONS_FIELD['category']])
+    if(notification[NOTIFICATIONS_FIELD['category']] == "invitation")
+        combinedString = `${user_link.outerHTML} has invited you to join “${group_link.outerHTML}” group`;
+    // Create a new h3 element
+    const notification_msg_element = document.createElement('h3');
+    notification_msg_element.innerHTML = combinedString;
+    
+    return notification_msg_element
+
+}
+
+function notification_handler(user_id, group_id, choice)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/handle-invite-notification', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({'id': user_id, 'group': group_id, 'choice': choice}));
+}
+
+
+
+function get_notification_element(notification)
+{
+    console.log(notification);
+    console.log("notif");
+    
+    const notification_element = document.createElement("div");
+    notification_element.className = "notification"
+    const accept_button = document.createElement("button");
+    accept_button.innerHTML = "Accept"
+    accept_button.className = "accept-button";
+    accept_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], true); };
+
+    const decline_button = document.createElement("button");
+    decline_button.className = "decline-button";
+    decline_button.innerHTML = "Decline"
+    accept_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], false); };
+
+    const notification_msg = create_notification_msg_element(notification);
+
+    notification_element.appendChild(notification_msg);
+    notification_element.appendChild(accept_button);
+    notification_element.appendChild(decline_button);
+    return notification_element;
+}
+
+function show_notifications()
+{
+    // get the select element
+    const select = document.getElementById('notifications-wrapper');
+    for (i in notifications)
+    {
+        const notification_element = get_notification_element(notifications[i])
+        select.appendChild(notification_element)
+        console.log("yay")
+    }
 }

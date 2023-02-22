@@ -5,7 +5,7 @@ import logging
 from flask import Flask, render_template
 from utils import (
     get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
-    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD,
+    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD, NOTIFICATIONS_FIELD,
     str_to_list, list_to_str,
     check_password, remove_password_field,
 )
@@ -521,6 +521,24 @@ def get_group_dict(groups_id):
         groups[id] = group[GROUP_FIELD['name']]
     return groups
 
+def get_detailed_notifications(user_id):
+    """returns a list of notifications which can be interperted by the frontend"""
+    notifications = get_user_notifications(user_id)
+    detailed_notifications = []
+    for notification in notifications:
+        initiator = get_user_by_id(notification[NOTIFICATIONS_FIELD['initiator']])
+        initiator_name = initiator[USER_FIELD['name']]
+        group = get_group(notification[NOTIFICATIONS_FIELD['group_']])
+        group_name = group[GROUP_FIELD['name']]
+        detailed_notification = list(notification)
+        detailed_notification.append(initiator_name)
+        detailed_notification.append(group_name)
+        logging.info(detailed_notification)
+        detailed_notifications.append(detailed_notification)
+    logging.info(detailed_notifications)
+    return detailed_notifications
+
+
 def get_user_notifications(user_id):
     try:
         usersConn = sqlite3.connect('notifications.db')
@@ -582,3 +600,25 @@ def invite_users(admin_id, group_id, user_id_list):
         group_invited.append(id)
     group_invited = list_to_str(group_invited)
     update_field("groups", group_id, "invited", group_invited)
+
+def add_to_group(id, group):
+    # add to user groups
+    # add to group users
+    # add +1 to group num
+    pass
+
+
+def handle_notification(id, group, choice):
+    # Remove all notifications of the specific user and group
+    values = (id, group)
+    query = "DELETE FROM mytable WHERE id=? AND group_=?"
+    try:
+        notificationsConn = sqlite3.connect('notifications.db')
+        with notificationsConn:
+            c = notificationsConn.cursor()
+            c.execute(query, values)
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return False
+    if choice:
+        add_to_group(id, group)

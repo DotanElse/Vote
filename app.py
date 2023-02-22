@@ -96,13 +96,13 @@ def process_login_form():
     id = query.get_user_by_email(email)[utils.USER_FIELD['id']]
     username = query.get_user_by_email(email)[utils.USER_FIELD['name']]
     groups_id = utils.str_to_list(query.get_user_by_email(email)[utils.USER_FIELD['groups']])
-    groups = query.get_group_dict(groups_id)
-    logging.info(f"groups dict is {groups}")
+    groups_dict = query.get_group_dict(groups_id)
 
     accessToken = create_jwt_access_token(user)
     voted = query.get_voted(id, polls)
-
-    resp = make_response(render_template('main_page.html', id=id, username=username, groups=groups, polls=polls, voted=voted, notifications=query.get_user_notifications(id)))
+    detailed_notifications = query.get_detailed_notifications(id)
+    logging.info("Done")
+    resp = make_response(render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=query.get_detailed_notifications(id)))
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     
@@ -219,6 +219,14 @@ def view_group(group_id):
         return query.group_view(group_id, None)
 
     return query.group_view(group_id, get_jwt_identity()['id'])
+
+@app.route('/handle-invite-notification', methods=['POST'])
+def my_function():
+    data = request.get_json()  # Get data from JavaScript request
+    query.handle_notification(data['id'], data['group'], data['choice'])
+    # Do some processing with the parameters
+    # ...
+    return '', 204  # Return empty response with 204 status code
 
 if __name__ == '__main__':
     logging.info("Server startup")

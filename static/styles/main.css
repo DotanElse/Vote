@@ -151,3 +151,31 @@ img {
 }
 
 /* group buttons */
+
+.accept-button {
+  display: block;      
+  width: 150px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  border: none;
+  background: #185;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+
+.decline-button {
+  display: block;      
+  width: 150px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  border: none;
+  background: #922;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 20px;
+}

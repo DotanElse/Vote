@@ -75,6 +75,13 @@ DISCUSSION_FIELD = {
     "u9": 29,
     "u10": 30,
 }
+NOTIFICATIONS_FIELD = {
+    "id": 0,
+    "time": 1,
+    "category": 2,
+    "initiator": 3,
+    "group_": 4,
+}
 
 def get_random_poll_id():
     characters = string.ascii_lowercase + string.digits
