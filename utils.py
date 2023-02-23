@@ -100,6 +100,7 @@ def get_random_perm_link():
     return "".join(random.choices(characters, k=_LINK_LEN))
     
 def str_to_list(input):
+    logging.info(input)
     # Split the input string on commas
     if not input:
         return []
@@ -108,6 +109,7 @@ def str_to_list(input):
     return [item.strip() for item in items]
 
 def list_to_str(input):
+    logging.info(input)
     return ', '.join(input)
 
 def encrypt(input : str):
@@ -121,3 +123,20 @@ def check_password(password, hashed):
 def remove_password_field(user):
     # only password is in byte form, sending it over to frontend
     return tuple(field for field in user if isinstance(field, str))
+
+def add_to_str(input, item):
+    """Convers a string into list, add the item and return it as a string"""
+    result = str_to_list(input)
+    result.append(item)
+    return list_to_str(result)
+
+def remove_from_str(input, item):
+    """Convers a string into list, remove the item (if exists) and return it as a string"""
+    result = str_to_list(input)
+    try:
+        result.remove(item)
+    except:
+        pass
+    return list_to_str(result)
+    
+

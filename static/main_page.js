@@ -310,12 +310,14 @@ function create_notification_msg_element(notification)
 
 }
 
-function notification_handler(user_id, group_id, choice)
+function notification_handler(user_id, group_id, choice, notification_element)
 {
+    notification_element.remove()
     var xhr = new XMLHttpRequest();
     xhr.open('POST', '/handle-invite-notification', true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify({'id': user_id, 'group': group_id, 'choice': choice}));
+    window.location.reload();
 }
 
 
@@ -330,12 +332,12 @@ function get_notification_element(notification)
     const accept_button = document.createElement("button");
     accept_button.innerHTML = "Accept"
     accept_button.className = "accept-button";
-    accept_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], true); };
+    accept_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], true, notification_element); };
 
     const decline_button = document.createElement("button");
     decline_button.className = "decline-button";
     decline_button.innerHTML = "Decline"
-    accept_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], false); };
+    decline_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], false, notification_element); };
 
     const notification_msg = create_notification_msg_element(notification);
 
@@ -353,6 +355,5 @@ function show_notifications()
     {
         const notification_element = get_notification_element(notifications[i])
         select.appendChild(notification_element)
-        console.log("yay")
     }
 }

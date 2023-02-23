@@ -6,8 +6,8 @@ from flask import Flask, render_template
 from utils import (
     get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
     USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD, NOTIFICATIONS_FIELD,
-    str_to_list, list_to_str,
-    check_password, remove_password_field,
+    str_to_list, list_to_str, add_to_str, remove_from_str,
+    check_password, remove_password_field, 
 )
 
 logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
@@ -601,17 +601,28 @@ def invite_users(admin_id, group_id, user_id_list):
     group_invited = list_to_str(group_invited)
     update_field("groups", group_id, "invited", group_invited)
 
-def add_to_group(id, group):
-    # add to user groups
-    # add to group users
-    # add +1 to group num
-    pass
+def add_to_group(id, group_id):
+    logging.info("start")
+    user = get_user_by_id(id)
+    group = get_group(group_id)
+    logging.info("a")
+    logging.info(type(user[USER_FIELD['groups']]))
+    user_groups = add_to_str(user[USER_FIELD['groups']], group_id)
+    logging.info("b")
+    group_users = add_to_str(group[GROUP_FIELD['users']], id)
+
+    update_field("users", id, "groups", user_groups)
+    update_field("groups", group_id, "usersNum", group[GROUP_FIELD['usersNum']]+1)
+    update_field("groups", group_id, "users", group_users)
+    return True
 
 
-def handle_notification(id, group, choice):
+def handle_notification(id, group_id, choice):
     # Remove all notifications of the specific user and group
-    values = (id, group)
-    query = "DELETE FROM mytable WHERE id=? AND group_=?"
+    logging.info("start")
+    logging.info(f"{id, group_id, choice}")
+    values = (id, group_id)
+    query = "DELETE FROM notifications WHERE id=? AND group_=?"
     try:
         notificationsConn = sqlite3.connect('notifications.db')
         with notificationsConn:
@@ -620,5 +631,10 @@ def handle_notification(id, group, choice):
     except BaseException as e:
         logging.warning(f"{e} raised")
         return False
+    group = get_group(group_id)
+    invited = group[GROUP_FIELD['invited']]
+    updated_invited = remove_from_str(group[GROUP_FIELD['invited']], id)
+    logging.info(f"well, invited is {invited} and after is {updated_invited}")
+    update_field("groups", group_id, "invited", updated_invited)
     if choice:
-        add_to_group(id, group)
+        add_to_group(id, group_id)
