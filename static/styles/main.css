@@ -19,14 +19,23 @@
   border: 1px solid brown;
 }
 		  
-#search-bar {
+#search-bar-wrapper {
+  display: flex;
   width: 80%;
   border: 1px solid red;
+  align-items: center;
+  justify-content: center;
 }
 
 #search-bar-icon, #new-vote-icon {
   width: 10%;
   border: 1px solid blue;
+}
+
+#search-bar {
+  height: 80%;
+  width: 95%;
+  border-radius: 20px;
 }
 
 #vote-icon {

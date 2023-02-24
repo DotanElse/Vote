@@ -32,6 +32,7 @@ poll_view(polls)
 submit_poll_option()
 show_groups()
 show_notifications()
+activate_search_button()
 
 function poll_view(polls)
 {
@@ -320,8 +321,6 @@ function notification_handler(user_id, group_id, choice, notification_element)
     window.location.reload();
 }
 
-
-
 function get_notification_element(notification)
 {
     console.log(notification);
@@ -356,4 +355,19 @@ function show_notifications()
         const notification_element = get_notification_element(notifications[i])
         select.appendChild(notification_element)
     }
+}
+
+function search_handler(text)
+{
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/search', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({'text': text}));
+}
+
+function activate_search_button()
+{
+    const search_button = document.getElementById('search-bar-icon');
+    const search_content = document.getElementById('search-bar');
+    search_button.onclick = function() { search_handler(search_content.value); };
 }

@@ -221,11 +221,16 @@ def view_group(group_id):
     return query.group_view(group_id, get_jwt_identity()['id'])
 
 @app.route('/handle-invite-notification', methods=['POST'])
-def my_function():
+def handle_invite_notification():
     data = request.get_json()  # Get data from JavaScript request
     query.handle_notification(data['id'], data['group'], data['choice'])
-    # Do some processing with the parameters
-    # ...
+    return '', 204  # Return empty response with 204 status code
+
+@app.route('/search', methods=['POST'])
+def search():
+    logging.info("asdf")
+    data = request.get_json()
+    logging.info(f"{data['text']} was searched")
     return '', 204  # Return empty response with 204 status code
 
 if __name__ == '__main__':
