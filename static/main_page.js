@@ -359,15 +359,45 @@ function show_notifications()
 
 function search_handler(text)
 {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/search', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({'text': text}));
+    console.log("start search handler")
+    for (var i in polls){
+        const curr_poll_id = polls[i][POLL_FIELD['id']]
+        const curr_poll_element = document.getElementById(curr_poll_id);
+        if(text == "")
+        {
+            curr_poll_element.style.display = "block";
+            continue;
+        }
+        console.log(curr_poll_element.style.display)
+        if (curr_poll_element.style.display == "block" || curr_poll_element.style.display == "")
+        {
+            console.log(i)
+            var poll_title = polls[i][POLL_FIELD['title']]
+            if (poll_title.includes(text))
+                continue;
+            curr_poll_element.style.display = "none";
+        }
+
+
+        // curr_poll_element.style.display = "block";
+    }    
+    
+    
+    // var xhr = new XMLHttpRequest();
+    // xhr.open('POST', '/search', true);
+    // xhr.setRequestHeader('Content-Type', 'application/json');
+    // xhr.send(JSON.stringify({'text': text}));
 }
 
 function activate_search_button()
 {
     const search_button = document.getElementById('search-bar-icon');
     const search_content = document.getElementById('search-bar');
+    document.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        search_handler(search_content.value)
+    }
+    });
     search_button.onclick = function() { search_handler(search_content.value); };
 }
