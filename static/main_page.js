@@ -102,7 +102,7 @@ function poll_view(polls)
         button.setAttribute("id", `button_${poll_id}`);
         button.className = "btn";
         button.setAttribute("type", "submit");
-        button.innerHTML = "Submit";
+        button.innerHTML = "Vote";
         formElement.appendChild(button);
         select.appendChild(formElement);
         console.log(`${poll_id}`);

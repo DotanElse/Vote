@@ -228,10 +228,18 @@ def handle_invite_notification():
 
 @app.route('/search', methods=['POST'])
 def search():
-    logging.info("asdf")
     data = request.get_json()
     logging.info(f"{data['text']} was searched")
     return '', 204  # Return empty response with 204 status code
+
+@app.route('/logout')
+@jwt_required()
+def logout():
+    resp = make_response(render_template('index.html'))
+    resp.set_cookie('access_token_cookie', value="", expires=-1)
+    return resp
+    revoke_token(get_raw_jwt()['jti'])
+    return render_template('logout.html')
 
 if __name__ == '__main__':
     logging.info("Server startup")
