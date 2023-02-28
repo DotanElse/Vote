@@ -231,6 +231,10 @@ function submit_poll_option()
 
 function show_all_groups()
 {
+    all_group_buttons = document.getElementsByClassName("group-button")
+    for (var i = 0; i < all_group_buttons.length; i++) {
+        all_group_buttons[i].style.border = "3px solid transparent";
+    }
     for (var i in polls){
         const curr_poll_id = polls[i][POLL_FIELD['id']]
         const curr_poll_element = document.getElementById(curr_poll_id);
@@ -240,7 +244,12 @@ function show_all_groups()
 
 function filter_groups(id)
 {
-    console.log(id)
+    curr_button = document.getElementById(id)
+    all_group_buttons = document.getElementsByClassName("group-button")
+    for (var i = 0; i < all_group_buttons.length; i++) {
+        all_group_buttons[i].style.border = "3px solid transparent";
+    }
+    curr_button.style.border = "3px solid green";
     for (var i in polls){
         const curr_poll_id = polls[i][POLL_FIELD['id']]
         const curr_poll_element = document.getElementById(curr_poll_id);
@@ -369,7 +378,7 @@ function get_notification_element(notification)
     
     time_created_wrapper.appendChild(time_created_text)
     notification_element.appendChild(time_created_wrapper);
-    
+
     return notification_element;
 }
 
