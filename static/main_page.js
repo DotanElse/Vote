@@ -4,6 +4,7 @@ console.log(username)
 console.log(groups)
 console.log(voted)
 console.log(notifications)
+console.log(Date.now())
 
 POLL_FIELD = {
     "id": 0,
@@ -27,6 +28,17 @@ NOTIFICATIONS_FIELD = {
     "initiator_name": 5,
     "group_name": 6,
 }
+
+function msToTime(ms) {
+    let seconds = (ms / 1000).toFixed(1);
+    let minutes = (ms / (1000 * 60)).toFixed(1);
+    let hours = (ms / (1000 * 60 * 60)).toFixed(1);
+    let days = (ms / (1000 * 60 * 60 * 24)).toFixed(1);
+    if (seconds < 60) return Math.floor(seconds) + " Sec ago";
+    else if (minutes < 60) return Math.floor(minutes) + " Min ago";
+    else if (hours < 24) return Math.floor(hours) + " Hrs ago";
+    else return Math.floor(days) + " Days ago"
+  }
 
 poll_view(polls)
 submit_poll_option()
@@ -305,6 +317,8 @@ function create_notification_msg_element(notification)
         combinedString = `${user_link.outerHTML} has invited you to join “${group_link.outerHTML}” group`;
     // Create a new h3 element
     const notification_msg_element = document.createElement('h3');
+    notification_msg_element.style.margin = "0px";
+    notification_msg_element.style.padding = "5px";
     notification_msg_element.innerHTML = combinedString;
     
     return notification_msg_element
@@ -323,11 +337,12 @@ function notification_handler(user_id, group_id, choice, notification_element)
 
 function get_notification_element(notification)
 {
-    console.log(notification);
-    console.log("notif");
-    
     const notification_element = document.createElement("div");
     notification_element.className = "notification"
+
+    const notification_buttons_wrapper = document.createElement("div");
+    notification_buttons_wrapper.className = "notification_buttons_wrapper"
+
     const accept_button = document.createElement("button");
     accept_button.innerHTML = "Accept"
     accept_button.className = "accept-button";
@@ -340,9 +355,21 @@ function get_notification_element(notification)
 
     const notification_msg = create_notification_msg_element(notification);
 
+    const time_created_wrapper = document.createElement("div");
+    time_created_wrapper.className = "time-created-wrapper"
+
+    const time_created_text = document.createElement("h4");
+    time_created_text.className = "notification-time-created";
+    time_created_text.textContent = msToTime(Date.now() - notification[NOTIFICATIONS_FIELD['time']]*1000);
+
     notification_element.appendChild(notification_msg);
-    notification_element.appendChild(accept_button);
-    notification_element.appendChild(decline_button);
+    notification_buttons_wrapper.appendChild(accept_button);
+    notification_buttons_wrapper.appendChild(decline_button);
+    notification_element.appendChild(notification_buttons_wrapper);
+    
+    time_created_wrapper.appendChild(time_created_text)
+    notification_element.appendChild(time_created_wrapper);
+    
     return notification_element;
 }
 
@@ -359,7 +386,6 @@ function show_notifications()
 
 function search_handler(text)
 {
-    console.log("start search handler")
     for (var i in polls){
         const curr_poll_id = polls[i][POLL_FIELD['id']]
         const curr_poll_element = document.getElementById(curr_poll_id);
@@ -368,21 +394,17 @@ function search_handler(text)
             curr_poll_element.style.display = "block";
             continue;
         }
-        console.log(curr_poll_element.style.display)
-        if (curr_poll_element.style.display == "block" || curr_poll_element.style.display == "")
+        var poll_title = polls[i][POLL_FIELD['title']]
+        if (poll_title.includes(text))
         {
-            console.log(i)
-            var poll_title = polls[i][POLL_FIELD['title']]
-            if (poll_title.includes(text))
-                continue;
+            curr_poll_element.style.display = "block";
+        }
+        else
+        {
             curr_poll_element.style.display = "none";
         }
-
-
-        // curr_poll_element.style.display = "block";
-    }    
-    
-    
+    }
+    // this is the code for the advanced search function
     // var xhr = new XMLHttpRequest();
     // xhr.open('POST', '/search', true);
     // xhr.setRequestHeader('Content-Type', 'application/json');

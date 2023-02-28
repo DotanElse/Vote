@@ -238,8 +238,6 @@ def logout():
     resp = make_response(render_template('index.html'))
     resp.set_cookie('access_token_cookie', value="", expires=-1)
     return resp
-    revoke_token(get_raw_jwt()['jti'])
-    return render_template('logout.html')
 
 if __name__ == '__main__':
     logging.info("Server startup")

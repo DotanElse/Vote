@@ -27,6 +27,12 @@
   justify-content: center;
 }
 
+#notifications-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #search-bar-icon, #new-vote-icon {
   width: 10%;
   border: 1px solid blue;
@@ -164,27 +170,54 @@ img {
 .accept-button {
   display: block;      
   width: 150px;
-  margin: 0 auto;
-  padding: 10px 20px;
+  padding: 3px;
+  margin: 3px;
   border: none;
   background: #185;
   color: #fff;
   font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
-  margin-top: 20px;
 }
 
 .decline-button {
   display: block;      
   width: 150px;
-  margin: 0 auto;
-  padding: 10px 20px;
+  padding: 3px;
+  margin: 3px;
   border: none;
   background: #922;
   color: #fff;
   font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
-  margin-top: 20px;
+}
+
+.notification {
+  border: 1px solid black;
+  border-radius: 20px;
+  margin: 5px;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+}
+
+.notification_buttons_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  
+}
+
+.time-created-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: right;
+}
+
+.notification-time-created {
+  text-align: right;
+  margin: 4px;
 }
