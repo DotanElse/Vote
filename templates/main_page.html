@@ -9,8 +9,12 @@
     <div id="menu">
       <div class="left">
       <div id="nested-left">
-        <div id="profile-pic">USER PIC WILL BE HERE</div>
-        <div id="username-plate"> {{ username }}</div>
+        <div id="profile-pic-wrapper">
+          <a href="" class="user-link"><img src="./static/img/users/{{id}}.jpg" alt="logout icon" id="profile-pic"></a>
+        </div>
+        <div id="username-plate"> 
+          {{ username }}
+        </div>
         <div id="logout">
           <a href="{{url_for('logout')}}"><img src="./static/img/logout-icon.png" alt="logout icon"></a>
         </div>

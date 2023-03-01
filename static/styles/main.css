@@ -7,24 +7,27 @@
   height: 100%;
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
-#profile-pic, #logout {
+#profile-pic-wrapper, #logout {
   width: 25%;
-  border: 1px solid green;
+}
+
+#logout {
+  border: 0px solid grey;
 }
 
 #username-plate {
   width: 50%;
-  border: 1px solid brown;
 }
 		  
 #search-bar-wrapper {
-  display: flex;
-  width: 80%;
-  border: 1px solid red;
-  align-items: center;
-  justify-content: center;
+  /* display: flex; */
+  width: 90%;
+  /* align-items: center;
+  justify-content: center; */
 }
 
 #notifications-wrapper {
@@ -34,29 +37,34 @@
 }
 
 #search-bar-icon, #new-vote-icon {
-  width: 10%;
-  border: 1px solid blue;
+  width: 15%;
+}
+
+#search-bar-icon {
+  opacity: 0;
 }
 
 #search-bar {
-  height: 80%;
-  width: 95%;
-  border-radius: 20px;
+  height: 60%;
+  width: 70%;
+  border-radius: 10px;
 }
 
 #vote-icon {
   width: 100%;
-  border: 1px solid purple;
+  border: 0px solid grey;
 }
 
 #main {
-  height: 95vh;
   display: flex;
-  border: 1px solid black;
+  height:Auto;
+  min-height: 95vh;
 }
 
-#main > div {
-  border: 1px solid black;
+#main > div, #menu > div {
+  border-left: 1px solid grey;
+  border-right: 1px solid grey;
+  box-sizing: border-box;
 }
 
 .left {
@@ -77,6 +85,10 @@ img {
   width: auto;
   height: 100%;
   object-fit: cover; /* this makes the image cover the height of the div while preserving its original aspect ratio */
+}
+
+#profile-pic {
+  border-radius: 100px;
 }
 
 #nested-left, #nested-middle, #nested-right {

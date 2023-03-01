@@ -102,7 +102,7 @@ def get_discussion(id):
         logging.warning(f"{e} raised")
         return None
 
-def submit_user(email, password, name, date):
+def submit_user(email, password, name, date, picture):
     id = get_random_user_id()
     if id_exists(id, "users"):
         logging.warning(f"existing user id submittion")
@@ -126,6 +126,7 @@ def submit_user(email, password, name, date):
             # add the user, all users are in the "0" group, which is THE WORLD
             c.execute("INSERT INTO users VALUES (:id, :email, :password, :name, :birthday, :groups)",
             {'id': id, 'email': email, 'password': password, 'name': name, 'birthday': date, 'groups': "0"})
+            picture.save(f"static/img/users/{id}.jpg")
             return True
     except BaseException as e:
         logging.warning(f"{e} raised")
@@ -284,7 +285,7 @@ def init_db():
             """)
             c.execute(
             "INSERT OR IGNORE INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :invited, :public)",
-            {'id': 0, 'name': "Public", 'description': "", 'creator': "0", 'users': "-", 'usersNum': "0",
+            {'id': 0, 'name': "World", 'description': "", 'creator': "0", 'users': "-", 'usersNum': "0",
             'permLink': "-", 'invited': '', 'public': "-"}
             )
     except BaseException as e:

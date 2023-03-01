@@ -4,7 +4,6 @@ console.log(username)
 console.log(groups)
 console.log(voted)
 console.log(notifications)
-console.log(Date.now())
 
 POLL_FIELD = {
     "id": 0,
@@ -45,6 +44,17 @@ submit_poll_option()
 show_groups()
 show_notifications()
 activate_search_button()
+activate_user_links()
+
+function activate_user_links()
+{
+    hrefs = document.getElementsByClassName("user-link")
+    user_link = create_link(id, username, "user")
+    for (var i = 0; i < hrefs.length; i++) {
+        hrefs[i].href  = user_link
+    }
+
+}
 
 function poll_view(polls)
 {
