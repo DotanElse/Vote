@@ -135,10 +135,21 @@ function poll_view(polls)
         vote_button.innerHTML = "Vote";
 
         poll_details = document.createElement("h5");
-        console.log(polls[i][8])
         // time given to poll - (now - created)
-        const time_left = msToTime(1000 * 60 * 60 * 24 * polls[i][9] - Date.now() + polls[i][1]*1000)
-        poll_details.textContent = polls[i][8].split(",").length + " voted | " + time_left + " left";
+        console.log(polls[i][1]);
+        const time_diff = Math.floor(Date.now()/1000) - polls[i][1];
+        const poll_duration_seconds = polls[i][9] * 60 * 60 * 24;
+        console.log(poll_duration_seconds);
+        console.log(time_diff);
+        const time_left = msToTime(1000*(poll_duration_seconds - time_diff))
+
+        var users_voted;
+        if (polls[i][8].split(",") == "")
+            users_voted = 0;
+        else
+            users_voted = polls[i][8].split(",").length;
+        
+        poll_details.textContent = users_voted + " voted | " + time_left + " left";
 
         details_vote_wrapper.appendChild(filler_div);
         details_vote_wrapper.appendChild(vote_button);
