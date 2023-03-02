@@ -91,17 +91,10 @@ def process_login_form():
     if not query.authorize_user(email, password):
         return render_template("failed_login.html")
     
-    user, polls = query.get_user_and_polls(email)
-
-    id = query.get_user_by_email(email)[utils.USER_FIELD['id']]
-    username = query.get_user_by_email(email)[utils.USER_FIELD['name']]
-    groups_id = utils.str_to_list(query.get_user_by_email(email)[utils.USER_FIELD['groups']])
-    groups_dict = query.get_group_dict(groups_id)
+    user, template = query.setup_main_page(email)
 
     accessToken = create_jwt_access_token(user)
-    voted = query.get_voted(id, polls)
-    logging.info("Done")
-    resp = make_response(render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=query.get_detailed_notifications(id)))
+    resp = make_response(template)
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     
@@ -251,6 +244,21 @@ def logout():
     resp = make_response(render_template('index.html'))
     resp.set_cookie('access_token_cookie', value="", expires=-1)
     return resp
+
+@app.route('/main')
+@jwt_required()
+def main_page():
+    user = get_jwt_identity()
+    logging.info(user)
+    email = user['email']
+
+    user, template = query.setup_main_page(email)
+
+    accessToken = create_jwt_access_token(user)
+    resp = make_response(template)
+    resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
+    return resp
+
 
 if __name__ == '__main__':
     logging.info("Server startup")

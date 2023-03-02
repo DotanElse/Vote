@@ -647,3 +647,15 @@ def handle_notification(id, group_id, choice):
     update_field("groups", group_id, "invited", updated_invited)
     if choice:
         add_to_group(id, group_id)
+
+def setup_main_page(email):
+    # after authenticating, returns a set of variables for main page
+    user, polls = get_user_and_polls(email)
+
+    id = get_user_by_email(email)[USER_FIELD['id']]
+    username = get_user_by_email(email)[USER_FIELD['name']]
+    groups_id = str_to_list(get_user_by_email(email)[USER_FIELD['groups']])
+    groups_dict = get_group_dict(groups_id)
+
+    voted = get_voted(id, polls)
+    return user, render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=get_detailed_notifications(id))

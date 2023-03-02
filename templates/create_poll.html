@@ -1,11 +1,17 @@
+ <html>
   <head>
     <meta charset="utf-8">
-    <title>poll creation</title>
+    <title>Vote creation</title>
+    <link rel="stylesheet" href="../static/styles/create_poll.css">
     <script src="../static/create_poll.js" defer></script>
   </head>
   <body>
-    <div class="title_container">
-      <form id="poll-form" action="/process_poll_creation" method="post"> <!-- #TODO - appear on button and form popup -->
+    <a href="{{url_for('main_page')}}"><img src="./static/img/back-arrow.png" alt="Logout"></a>
+    <div class="container">
+      <div class="title_container">
+        <h1>Create a Poll</h1>
+      </div>
+      <form id="poll-form" class="form_container" action="/process_poll_creation" method="post">
         <label for="name">Title:</label><br>
         <input type="text" id="title" name="title" required><br>
         <label for="group">Group:</label><br>
@@ -17,8 +23,7 @@
         <input type="text" id="optionNames" name="optionNames" required><br><br>
         <label for="duration">Duration(Days):</label><br>
         <input name="duration" id="duration" type="range" min="1" max="7" step="1" value="1" oninput="this.nextElementSibling.value = this.value">
-        <output>1</output>
-        </input><br><br>
+        <output>1</output><br><br>
         <input type="submit" value="Submit">
       </form>
     </div>
