@@ -4,6 +4,7 @@ console.log(username)
 console.log(groups)
 console.log(voted)
 console.log(notifications)
+console.log(polls)
 
 POLL_FIELD = {
     "id": 0,
@@ -33,10 +34,10 @@ function msToTime(ms) {
     let minutes = (ms / (1000 * 60)).toFixed(1);
     let hours = (ms / (1000 * 60 * 60)).toFixed(1);
     let days = (ms / (1000 * 60 * 60 * 24)).toFixed(1);
-    if (seconds < 60) return Math.floor(seconds) + " Sec ago";
-    else if (minutes < 60) return Math.floor(minutes) + " Min ago";
-    else if (hours < 24) return Math.floor(hours) + " Hrs ago";
-    else return Math.floor(days) + " Days ago"
+    if (seconds < 60) return Math.floor(seconds) + " Sec";
+    else if (minutes < 60) return Math.floor(minutes) + " Min";
+    else if (hours < 24) return Math.floor(hours) + " Hrs";
+    else return Math.floor(days) + " Days"
   }
 
 poll_view(polls)
@@ -51,7 +52,7 @@ function activate_user_links()
     hrefs = document.getElementsByClassName("user-link")
     user_link = create_link(id, username, "user")
     for (var i = 0; i < hrefs.length; i++) {
-        hrefs[i].href  = user_link
+        hrefs[i].href  = user_link;
     }
 
 }
@@ -120,13 +121,33 @@ function poll_view(polls)
             optionDiv.appendChild(optionElement);
             optionNum++;
         }
-        var button = document.createElement("button");
-        button.setAttribute("id", `button_${poll_id}`);
-        button.className = "btn";
-        button.setAttribute("type", "submit");
-        button.innerHTML = "Vote";
-        formElement.appendChild(button);
+        
+        const details_vote_wrapper = document.createElement("div");
+        details_vote_wrapper.className = "details-vote-wrapper"
+        
+        const filler_div = document.createElement("div");
+        filler_div.className = "filler-div";
+
+        const vote_button = document.createElement("button");
+        vote_button.setAttribute("id", `button_${poll_id}`);
+        vote_button.className = "btn";
+        vote_button.setAttribute("type", "submit");
+        vote_button.innerHTML = "Vote";
+
+        poll_details = document.createElement("h5");
+        console.log(polls[i][8])
+        // time given to poll - (now - created)
+        const time_left = msToTime(1000 * 60 * 60 * 24 * polls[i][9] - Date.now() + polls[i][1]*1000)
+        poll_details.textContent = polls[i][8].split(",").length + " voted | " + time_left + " left";
+
+        details_vote_wrapper.appendChild(filler_div);
+        details_vote_wrapper.appendChild(vote_button);
+        details_vote_wrapper.appendChild(poll_details);
+    
+        formElement.appendChild(details_vote_wrapper);
+
         select.appendChild(formElement);
+
         console.log(`${poll_id}`);
         if (`${poll_id}` in voted)
         {
@@ -198,7 +219,7 @@ function create_voting_canvas(optionValues, selectedOption)
 function voted_for_poll(form_id, optionValues, selectedOption)
 {
     var button = document.getElementById(`button_${form_id}`);
-    button.remove();
+    button.style.visibility = "hidden";
     console.log(`submit button removed for ${form_id}`);
     var currForm = document.getElementById(form_id);
     var currFormDiv = document.getElementById(`div_${form_id}`);
@@ -379,7 +400,7 @@ function get_notification_element(notification)
 
     const time_created_text = document.createElement("h4");
     time_created_text.className = "notification-time-created";
-    time_created_text.textContent = msToTime(Date.now() - notification[NOTIFICATIONS_FIELD['time']]*1000);
+    time_created_text.textContent = msToTime(Date.now() - notification[NOTIFICATIONS_FIELD['time']]*1000) + " ago"
 
     notification_element.appendChild(notification_msg);
     notification_buttons_wrapper.appendChild(accept_button);

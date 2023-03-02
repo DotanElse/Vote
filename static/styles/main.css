@@ -161,6 +161,17 @@ img {
   background: #666;
 }
 
+.details-vote-wrapper {
+  display: flex;
+}
+
+.filler-div {
+  width: 25%;
+}
+
+.vote_button
+
+
 /* vote forms */
 
 .group-button {
