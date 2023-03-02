@@ -5,11 +5,6 @@ console.log(admin)
 console.log(extended)
 console.log(users)
 
-
-
-
-
-
 const GROUP_FIELD = {
   "id": 0,
   "name": 1,

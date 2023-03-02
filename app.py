@@ -10,7 +10,7 @@ import query
 
 logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 app.config['JWT_SECRET_KEY'] = 'super-secret-vote'
 app.config["JWT_TOKEN_LOCATION"] = ['cookies']
@@ -94,13 +94,31 @@ def process_login_form():
     user, polls = query.get_user_and_polls(email)
 
     id = query.get_user_by_email(email)[utils.USER_FIELD['id']]
+    username = query.get_user_by_email(email)[utils.USER_FIELD['name']]
+    groups_id = utils.str_to_list(query.get_user_by_email(email)[utils.USER_FIELD['groups']])
+    groups_dict = query.get_group_dict(groups_id)
+
     accessToken = create_jwt_access_token(user)
     voted = query.get_voted(id, polls)
-
-    resp = make_response(render_template('main_page.html', id=id, polls=polls, voted=voted, notifications=query.get_user_notifications(id)))
+    detailed_notifications = query.get_detailed_notifications(id)
+    logging.info("Done")
+    resp = make_response(render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=query.get_detailed_notifications(id)))
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
     
+
+@app.route("/signup", methods=["GET", "POST"])
+def signup():
+    if request.method == "POST":
+        # handle form submission
+        picture = request.files.get("picture")
+        if picture:
+            picture.save("path/to/your/assets/directory/picture.jpg")
+        # other form fields handling
+    else:
+        # render the form template
+        return render_template("signup.html")
+
 @app.route('/process_user_register', methods=['POST'])
 def process_register_form():
     logging.info("start")
@@ -109,8 +127,9 @@ def process_register_form():
     email = request.form['email']
     password = utils.encrypt(request.form['password'])
     birthday = request.form['birthday']
+    picture = request.files.get("picture")
 
-    if query.submit_user(email, password, name, birthday):
+    if query.submit_user(email, password, name, birthday, picture):
         return render_template('index.html')
     
     return render_template('error.html') # eventually change to popup at main site (additional param to main_page)
@@ -214,6 +233,25 @@ def view_group(group_id):
         return query.group_view(group_id, None)
 
     return query.group_view(group_id, get_jwt_identity()['id'])
+
+@app.route('/handle-invite-notification', methods=['POST'])
+def handle_invite_notification():
+    data = request.get_json()  # Get data from JavaScript request
+    query.handle_notification(data['id'], data['group'], data['choice'])
+    return '', 204  # Return empty response with 204 status code
+
+@app.route('/search', methods=['POST'])
+def search():
+    data = request.get_json()
+    logging.info(f"{data['text']} was searched")
+    return '', 204  # Return empty response with 204 status code
+
+@app.route('/logout')
+@jwt_required()
+def logout():
+    resp = make_response(render_template('index.html'))
+    resp.set_cookie('access_token_cookie', value="", expires=-1)
+    return resp
 
 if __name__ == '__main__':
     logging.info("Server startup")

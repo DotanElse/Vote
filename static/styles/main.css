@@ -1,0 +1,249 @@
+#menu {
+  height: 5vh;
+  display: flex;
+}
+
+#nested-left, #nested-middle, #nested-right {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+#profile-pic-wrapper, #logout {
+  width: 25%;
+}
+
+#logout {
+  border: 0px solid grey;
+}
+
+#username-plate {
+  width: 50%;
+}
+		  
+#search-bar-wrapper {
+  /* display: flex; */
+  width: 90%;
+  /* align-items: center;
+  justify-content: center; */
+}
+
+#notifications-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#search-bar-icon, #new-vote-icon {
+  width: 15%;
+}
+
+#search-bar-icon {
+  opacity: 0;
+}
+
+#search-bar {
+  height: 60%;
+  width: 70%;
+  border-radius: 10px;
+}
+
+#vote-icon {
+  width: 100%;
+  border: 0px solid grey;
+}
+
+#main {
+  display: flex;
+  height:Auto;
+  min-height: 95vh;
+}
+
+#main > div, #menu > div {
+  border-left: 1px solid grey;
+  border-right: 1px solid grey;
+  box-sizing: border-box;
+}
+
+.left {
+  width: 25%;
+}
+
+.middle {
+  width: 50%;
+}
+
+.right {
+  width: 25%;
+}
+
+/* doc basic structure */
+
+img {
+  width: auto;
+  height: 100%;
+  object-fit: cover; /* this makes the image cover the height of the div while preserving its original aspect ratio */
+}
+
+#profile-pic {
+  border-radius: 100px;
+}
+
+#nested-left, #nested-middle, #nested-right {
+	text-align: center;
+}
+
+/* pictures and icons */
+
+.radar-form {
+  width: 650px;
+  margin: 10 auto;
+  text-align: left;
+  font-family: sans-serif;
+  border: 2px solid #000;
+  border-radius: 25px;
+  padding: 20px;
+  padding-top: 10px
+}
+.radar-form h1 {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+.radar-form p {
+  color: #666;
+  font-size: 24px;
+}
+.radar-form .option {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  border-top: 1px solid #000;
+}
+.radar-form .option-description {
+  flex: 1;
+  margin-left: 10px;
+  color: #666;
+  font-size: 16px;
+}
+.radar-form input[type="radio"] {
+  display: none;
+}
+.radar-form label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #666;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+}
+.radar-form input[type="radio"]:checked + label {
+  border: 2px solid #333;
+  background: #333;
+}
+.radar-form .btn {
+  display: block;      
+  width: 150px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  border: none;
+  background: #333;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 20px;
+}
+.radar-form .btn:hover {
+  background: #666;
+}
+
+.details-vote-wrapper {
+  display: flex;
+}
+
+.filler-div {
+  width: 25%;
+}
+
+
+/* vote forms */
+
+.group-button {
+  display: block;      
+  width: 150px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  border: none;
+  background: #349;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 20px;
+  box-sizing: border-box;
+  border: 3px solid transparent;
+}
+
+#explore-button, #new-group-button {
+  width: 250px;
+}
+
+/* group buttons */
+
+.accept-button {
+  display: block;      
+  width: 150px;
+  padding: 3px;
+  margin: 3px;
+  border: none;
+  background: #185;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.decline-button {
+  display: block;      
+  width: 150px;
+  padding: 3px;
+  margin: 3px;
+  border: none;
+  background: #922;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.notification {
+  border: 1px solid black;
+  border-radius: 20px;
+  margin: 5px;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+}
+
+.notification_buttons_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  
+}
+
+.time-created-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  text-align: right;
+}
+
+.notification-time-created {
+  text-align: right;
+  margin: 4px;
+}

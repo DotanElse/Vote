@@ -5,9 +5,9 @@ import logging
 from flask import Flask, render_template
 from utils import (
     get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
-    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD,
-    str_to_list, list_to_str,
-    check_password, remove_password_field,
+    USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD, NOTIFICATIONS_FIELD,
+    str_to_list, list_to_str, add_to_str, remove_from_str,
+    check_password, remove_password_field, 
 )
 
 logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
@@ -102,7 +102,7 @@ def get_discussion(id):
         logging.warning(f"{e} raised")
         return None
 
-def submit_user(email, password, name, date):
+def submit_user(email, password, name, date, picture):
     id = get_random_user_id()
     if id_exists(id, "users"):
         logging.warning(f"existing user id submittion")
@@ -126,6 +126,7 @@ def submit_user(email, password, name, date):
             # add the user, all users are in the "0" group, which is THE WORLD
             c.execute("INSERT INTO users VALUES (:id, :email, :password, :name, :birthday, :groups)",
             {'id': id, 'email': email, 'password': password, 'name': name, 'birthday': date, 'groups': "0"})
+            picture.save(f"static/img/users/{id}.jpg")
             return True
     except BaseException as e:
         logging.warning(f"{e} raised")
@@ -284,7 +285,7 @@ def init_db():
             """)
             c.execute(
             "INSERT OR IGNORE INTO groups VALUES (:id, :name, :description, :creator, :users, :usersNum, :permLink, :invited, :public)",
-            {'id': 0, 'name': "Public", 'description': "", 'creator': "0", 'users': "-", 'usersNum': "0",
+            {'id': 0, 'name': "World", 'description': "", 'creator': "0", 'users': "-", 'usersNum': "0",
             'permLink': "-", 'invited': '', 'public': "-"}
             )
     except BaseException as e:
@@ -512,6 +513,33 @@ def get_uninvited_users(group_id):
     uninvited_dict = {user[USER_FIELD['id']]: user[USER_FIELD['name']] for user in uninvited_users}
     return uninvited_dict
 
+def get_group_dict(groups_id):
+    groups = {}
+    for id in groups_id:
+        group = get_group(id)
+        if group == None:
+            continue
+        groups[id] = group[GROUP_FIELD['name']]
+    return groups
+
+def get_detailed_notifications(user_id):
+    """returns a list of notifications which can be interperted by the frontend"""
+    notifications = get_user_notifications(user_id)
+    detailed_notifications = []
+    for notification in notifications:
+        initiator = get_user_by_id(notification[NOTIFICATIONS_FIELD['initiator']])
+        initiator_name = initiator[USER_FIELD['name']]
+        group = get_group(notification[NOTIFICATIONS_FIELD['group_']])
+        group_name = group[GROUP_FIELD['name']]
+        detailed_notification = list(notification)
+        detailed_notification.append(initiator_name)
+        detailed_notification.append(group_name)
+        logging.info(detailed_notification)
+        detailed_notifications.append(detailed_notification)
+    logging.info(detailed_notifications)
+    return detailed_notifications
+
+
 def get_user_notifications(user_id):
     try:
         usersConn = sqlite3.connect('notifications.db')
@@ -573,3 +601,41 @@ def invite_users(admin_id, group_id, user_id_list):
         group_invited.append(id)
     group_invited = list_to_str(group_invited)
     update_field("groups", group_id, "invited", group_invited)
+
+def add_to_group(id, group_id):
+    logging.info("start")
+    user = get_user_by_id(id)
+    group = get_group(group_id)
+    logging.info("a")
+    logging.info(type(user[USER_FIELD['groups']]))
+    user_groups = add_to_str(user[USER_FIELD['groups']], group_id)
+    logging.info("b")
+    group_users = add_to_str(group[GROUP_FIELD['users']], id)
+
+    update_field("users", id, "groups", user_groups)
+    update_field("groups", group_id, "usersNum", group[GROUP_FIELD['usersNum']]+1)
+    update_field("groups", group_id, "users", group_users)
+    return True
+
+
+def handle_notification(id, group_id, choice):
+    # Remove all notifications of the specific user and group
+    logging.info("start")
+    logging.info(f"{id, group_id, choice}")
+    values = (id, group_id)
+    query = "DELETE FROM notifications WHERE id=? AND group_=?"
+    try:
+        notificationsConn = sqlite3.connect('notifications.db')
+        with notificationsConn:
+            c = notificationsConn.cursor()
+            c.execute(query, values)
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return False
+    group = get_group(group_id)
+    invited = group[GROUP_FIELD['invited']]
+    updated_invited = remove_from_str(group[GROUP_FIELD['invited']], id)
+    logging.info(f"well, invited is {invited} and after is {updated_invited}")
+    update_field("groups", group_id, "invited", updated_invited)
+    if choice:
+        add_to_group(id, group_id)
