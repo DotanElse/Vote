@@ -401,10 +401,18 @@ def get_user_and_polls(email):
             c = pollsConn.cursor()
             c.execute(query, groupField)
             polls = c.fetchall()
-        return user, polls
     except BaseException as e:
         logging.warning(f"{e} raised")
         return None, None
+    active_polls = []
+    for poll in polls:
+        days_diff = (int(time.time()) - poll[POLL_FIELD['startTime']])/(60 * 60 * 24)
+        if days_diff > int(poll[POLL_FIELD['duration']]): # too much time has passed
+            continue
+        active_polls.append(poll)
+    sorted_active_polls = sorted(active_polls, key=lambda x: x[POLL_FIELD['startTime']], reverse=True)
+    return user, sorted_active_polls
+
 
 def update_poll_votes(poll_id, optionValues, voters):
     logging.info("start")

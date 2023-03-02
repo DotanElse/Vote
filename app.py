@@ -100,7 +100,6 @@ def process_login_form():
 
     accessToken = create_jwt_access_token(user)
     voted = query.get_voted(id, polls)
-    detailed_notifications = query.get_detailed_notifications(id)
     logging.info("Done")
     resp = make_response(render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=query.get_detailed_notifications(id)))
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
