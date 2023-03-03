@@ -1,11 +1,16 @@
   <head>
     <meta charset="utf-8">
     <title>Group creation</title>
+    <link rel="stylesheet" href="../static/styles/create_group.css">
     <script src="../static/create_group.js" defer></script>
   </head>
   <body>
-    <div class="title_container">
-      <form id="poll-form" action="/process_group_creation" method="post"> <!-- #TODO - appear on button and form popup -->
+    <a href="{{url_for('main_page')}}"><img src="./static/img/back-arrow.png" alt="Logout"></a>
+    <div class="container">
+      <div class="title_container">
+        <h1>Create New Group</h1>
+      </div>
+      <form id="poll-form" class="form_container" action="/process_group_creation" method="post">
         <label for="name">Group name:</label><br>
         <input type="text" id="name" name="name" required><br>
         <label for="description">Description(optional):</label><br>

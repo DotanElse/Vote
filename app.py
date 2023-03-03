@@ -142,7 +142,6 @@ def process_poll_creation():
 
     if query.submit_poll(creator, title, group_id, description, optionNames, duration):
         return main_page()
-        return render_template('index.html')
     
     return render_template('error.html')
 
@@ -156,7 +155,8 @@ def process_group_creation():
     public = request.form.get('public').strip()
 
     if query.submit_group(creator, groupName, description, public):
-        return render_template('index.html')
+        return main_page()
+    
     return render_template('error.html')
 
 @jwt_required
