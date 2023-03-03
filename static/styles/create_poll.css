@@ -1,0 +1,101 @@
+.container {
+    width: 30%;
+    margin: auto;
+  }
+.title_container {
+padding-top: 50px;
+}
+.title_container h1 {
+font-size: 36px;
+margin-bottom: 20px;
+}
+.form_container {
+background-color: #f2f2f2;
+padding: 20px;
+border-radius: 10px;
+}
+.form_container label {
+display: inline-block;
+margin-bottom: 10px;
+font-size: 18px;
+font-weight: bold;
+text-align: left;
+}
+.form_container input[type="text"], .form_container select {
+padding: 10px;
+font-size: 16px;
+border-radius: 5px;
+border: none;
+width: 90%;
+margin-bottom: 20px;
+box-sizing: border-box;
+}
+.form_container input[type="range"] {
+width: 60%;
+margin-bottom: 20px;
+}
+.form_container output {
+display: inline-block;
+width: 10%;
+margin-left: 10px;
+font-size: 16px;
+}
+.form_container input[type="submit"] {
+background-color: #4CAF50;
+color: white;
+padding: 12px 20px;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 16px;
+margin-top: 20px;
+}
+.form_container input[type="submit"]:hover {
+background-color: #45a049;
+}
+.options-container
+{
+  width: 100%;
+  align-items: center;
+}
+
+.options-container input[type="text"] {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 10px;
+}
+
+.options-container button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  background-color: #ccc;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.remove-option
+{
+  background-color: rgb(220, 23, 39);
+  border-color: transparent;
+  margin-left: 10px;
+  padding: 3px 8px;
+
+}
+.add-option
+{
+  padding: 3px 8px;
+  border-color: transparent;
+  background-color: green;
+}
+
+
+img {
+    width: auto;
+    height: 10%;
+    object-fit: cover;
+    margin: 0px;
+}
