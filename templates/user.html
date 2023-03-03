@@ -2,16 +2,22 @@
   <head>
     <meta charset="utf-8">
     <title>User Page</title>
+    <link rel="stylesheet" href="../static/styles/user.css">
     <script src="../static/user.js" defer></script>
   </head>
   <body>
-    <div class="user_container">
-      <h2>Title for user page</h2>
+    <a href="{{url_for('main_page')}}"><img src="../static/img/back-arrow.png" alt="return button" id="return"></a>
+  <div class="profile">
+    <img class="profile-image" src="../static/img/users/{{user[0]}}.jpg">
+    <h1 class="profile-username">Username</h1>
+    <div class="profile-details">
+      <p id="profile-birthday"></p>
     </div>
-    <div id="user_details"></div>
+  </div>
   </body>
   <script type="text/javascript">
     user = JSON.parse('{{user|tojson|safe}}')
+    console.log(typeof(user[3]))
     is_owner = JSON.parse('{{is_owner|tojson|safe}}')
   </script>
 </html>
