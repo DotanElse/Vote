@@ -5,3 +5,4 @@ polls.db
 discussions.db
 groups.db
 notifications.db
+users/
