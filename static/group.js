@@ -4,6 +4,7 @@ console.log(user)
 console.log(admin)
 console.log(extended)
 console.log(users)
+console.log(group_users)
 
 const GROUP_FIELD = {
   "id": 0,
@@ -32,7 +33,8 @@ if(extended)
   extendedInfo.appendChild(info);
 }
 
-if (admin) { // only admin can invite users
+function activate_invite_users()
+{
   const container = document.createElement("div");
   container.style.display = "flex";
   container.style.alignItems = "center";
@@ -100,7 +102,88 @@ if (admin) { // only admin can invite users
         const selectedButtons = document.querySelectorAll(".selected");
         for (const button of selectedButtons) {
           button.remove();
+          window.location.reload();
         }
       });
   });
+}
+
+function activate_remove_users()
+{
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.alignItems = "center";
+
+  const searchInput = document.createElement("input");
+  searchInput.type = "text";
+  searchInput.id = "searchInput";
+
+  const submitButton = document.createElement("button");
+  submitButton.innerHTML = "Remove";
+  submitButton.id = "submitButton";
+
+  container.appendChild(searchInput);
+  container.appendChild(submitButton);
+
+  const buttonsContainer = document.getElementById("buttonsContainer");
+  buttonsContainer.appendChild(container);
+
+  for (let user in group_users) {
+    const button = document.createElement("button");
+    button.textContent = group_users[user];
+    button.classList.add("button");
+    button.addEventListener("click", function() {
+      this.classList.toggle("selected");
+    });
+    button.dataset.id = user;
+    buttonsContainer.appendChild(button);
+  }
+
+  searchInput.addEventListener("input", function() {
+    const inputValue = this.value.toLowerCase();
+    const buttons = buttonsContainer.querySelectorAll(".button");
+    for (const button of buttons) {
+      const buttonText = button.textContent.toLowerCase();
+      if (buttonText.includes(inputValue)) {
+        button.style.display = "block";
+      } else {
+        button.style.display = "none";
+      }
+    }
+  });
+
+  submitButton.addEventListener("click", function() {
+    // Get the list of selected buttons
+    const selectedButtons = document.querySelectorAll(".selected");
+    const selectedIds = [];
+    for (const button of selectedButtons) {
+      selectedIds.push(button.dataset.id);
+    }
+
+    // Send the list of selected buttons to the Flask function
+    const formData = JSON.stringify({ ids: selectedIds });
+
+    fetch(`/process_group_removal/${group[GROUP_FIELD['id']]}`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: formData
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data.message);
+        const selectedButtons = document.querySelectorAll(".selected");
+        for (const button of selectedButtons) {
+          button.remove();
+          window.location.reload();
+        }
+      });
+  });
+}
+
+if (admin) { // only admin can invite users
+  activate_invite_users()
+  activate_remove_users()
 }
