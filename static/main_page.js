@@ -310,11 +310,20 @@ function filter_groups(id)
     }
 }
 
+function group_page_link(group_id)
+{
+    window.location.href = `/group/${group_id}`;
+}
+
 
 function show_groups()
 {
     // get the select element
     var select = document.getElementById('groups-wrapper');
+
+
+    var button_wrapper = document.createElement("div");
+    button_wrapper.className = "group-wrapper";
 
     // create the "explore" button, which shows all polls
     const all_groups_button = document.createElement("button");
@@ -322,19 +331,36 @@ function show_groups()
     all_groups_button.id = "explore-button"
     all_groups_button.className = "group-button";
     all_groups_button.onclick = function() { show_all_groups(); };
-    select.appendChild(all_groups_button)
+
+    button_wrapper.appendChild(all_groups_button);
+    select.appendChild(button_wrapper);
 
     // create group buttons
     for (var id in groups){
-        console.log(id, groups[id]);
+        const group_wrapper = document.createElement("div");
+        group_wrapper.className = "group-wrapper";
 
         const button = document.createElement("button");
         button.innerHTML = groups[id];
-        button.id = id
+        button.id = id;
         button.className = "group-button";
         button.onclick = function() { filter_groups(button.id); };
-        select.appendChild(button);
+
+        group_wrapper.appendChild(button);
+
+        const group_link_button = document.createElement("button");
+        group_link_button.innerHTML = "..."
+        group_link_button.className = "group_link_button"
+        group_link_button.id = `link-${id}`
+        group_link_button.onclick = function() { group_page_link(button.id); };
+
+        group_wrapper.appendChild(group_link_button);
+
+        select.appendChild(group_wrapper);
     }
+
+    var button_wrapper = document.createElement("div");
+    button_wrapper.className = "group-wrapper";
 
     // create "add new group" button
     const new_group_button = document.createElement("button");
@@ -344,7 +370,8 @@ function show_groups()
     new_group_button.onclick = function () {
     location.href = create_poll_url;
     };
-    select.appendChild(new_group_button)
+    button_wrapper.appendChild(new_group_button);
+    select.appendChild(button_wrapper);
 }
 
 function create_link(id, name, type) {
