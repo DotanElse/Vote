@@ -173,10 +173,16 @@ img {
 
 /* vote forms */
 
+.group-wrapper
+{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .group-button {
   display: block;      
   width: 150px;
-  margin: 0 auto;
   padding: 10px 20px;
   border: none;
   background: #349;
@@ -184,13 +190,32 @@ img {
   font-size: 16px;
   cursor: pointer;
   border-radius: 4px;
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   box-sizing: border-box;
   border: 3px solid transparent;
+  text-align: center;
 }
 
+
 #explore-button, #new-group-button {
+  text-align: center;
   width: 250px;
+}
+
+.group_link_button {
+  display: block;      
+  margin: 0px;
+  margin-left: 10px;
+  margin-right: 0px;
+  padding: 3px 5px;
+  border: none;
+  background: rgb(67, 94, 145);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 /* group buttons */
