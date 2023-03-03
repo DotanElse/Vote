@@ -9,7 +9,7 @@
     <a href="{{url_for('main_page')}}"><img src="./static/img/back-arrow.png" alt="Logout"></a>
     <div class="container">
       <div class="title_container">
-        <h1>Create a Poll</h1>
+        <h1>Create a Vote</h1>
       </div>
       <form id="poll-form" class="form_container" action="/process_poll_creation" method="post">
         <label for="name">Title:</label><br>
@@ -19,8 +19,12 @@
         <label for="description">Description(optional):</label><br>
         <input type="text" id="description" name="description"><br>
         <input type="hidden" name="creator" value="{{ email }}">
-        <label for="optionNames">Options:</label><br>
-        <input type="text" id="optionNames" name="optionNames" required><br><br>
+        <label for="optionNames">Options:</label>
+        <div id="options-container">
+          <input type="text" name="option" class="option" required><br>
+          <input type="text" name="option" class="option" required><br>
+          <button type="button" class="add-option">+</button><br><br>
+        </div>
         <label for="duration">Duration(Days):</label><br>
         <input name="duration" id="duration" type="range" min="1" max="7" step="1" value="1" oninput="this.nextElementSibling.value = this.value">
         <output>1</output><br><br>

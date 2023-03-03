@@ -1,7 +1,6 @@
 .container {
     width: 30%;
     margin: auto;
-    text-align: center;
   }
 .title_container {
 padding-top: 50px;
@@ -27,12 +26,12 @@ padding: 10px;
 font-size: 16px;
 border-radius: 5px;
 border: none;
-width: 100%;
+width: 90%;
 margin-bottom: 20px;
 box-sizing: border-box;
 }
 .form_container input[type="range"] {
-width: 80%;
+width: 60%;
 margin-bottom: 20px;
 }
 .form_container output {
@@ -54,9 +53,49 @@ margin-top: 20px;
 .form_container input[type="submit"]:hover {
 background-color: #45a049;
 }
+.options-container
+{
+  width: 100%;
+  align-items: center;
+}
+
+.options-container input[type="text"] {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  margin-right: 10px;
+}
+
+.options-container button {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: none;
+  background-color: #ccc;
+  cursor: pointer;
+  margin-left: 10px;
+}
+.remove-option
+{
+  background-color: rgb(220, 23, 39);
+  border-color: transparent;
+  margin-left: 10px;
+  padding: 3px 8px;
+
+}
+.add-option
+{
+  padding: 3px 8px;
+  border-color: transparent;
+  background-color: green;
+}
+
 
 img {
     width: auto;
     height: 10%;
     object-fit: cover;
+    margin: 0px;
 }

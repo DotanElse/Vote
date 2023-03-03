@@ -137,10 +137,11 @@ def process_poll_creation():
     group_id = query.get_group_id(group_name)
     logging.info(f"group id is {group_id}")
     description = request.form.get('description').strip()
-    optionNames = request.form.get('optionNames').strip()
+    optionNames = utils.list_to_str(request.form.getlist('option'))
     duration = request.form.get('duration').strip()
 
     if query.submit_poll(creator, title, group_id, description, optionNames, duration):
+        return main_page()
         return render_template('index.html')
     
     return render_template('error.html')
@@ -249,7 +250,6 @@ def logout():
 @jwt_required()
 def main_page():
     user = get_jwt_identity()
-    logging.info(user)
     email = user['email']
 
     user, template = query.setup_main_page(email)
