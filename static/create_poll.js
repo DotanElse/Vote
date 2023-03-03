@@ -37,6 +37,7 @@ function activate_option_button()
     const newOption = document.createElement('input');
     newOption.type = 'text';
     newOption.name = 'option';
+    newOption.required = true;
     newOption.classList.add('option');
   
     const newButton = document.createElement('button');

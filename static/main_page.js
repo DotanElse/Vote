@@ -78,11 +78,15 @@ function poll_view(polls)
         titleElement.textContent = pollName;
         formElement.appendChild(titleElement);
 
-        const poll_description = polls[i][5]
+        const poll_description = polls[i][5];
+        console.log(poll_description)
         if (poll_description)
+        {
             var descriptionElement = document.createElement("p");
             descriptionElement.textContent = poll_description;
             formElement.appendChild(descriptionElement);
+        }
+
 
         // creating first div which will hold canvas and option div
         const formDiv = document.createElement("div");
