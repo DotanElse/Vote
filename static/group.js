@@ -6,6 +6,8 @@ console.log(extended)
 console.log(users)
 console.log(group_users)
 
+
+
 const GROUP_FIELD = {
   "id": 0,
   "name": 1,
@@ -17,19 +19,123 @@ const GROUP_FIELD = {
   "invited": 7,
   "public": 8,
 }
-const basicInfo = document.getElementById("basic-info");
-let info = document.createElement("h1");
-info.innerHTML = `${group[GROUP_FIELD['name']]}`;
-basicInfo.appendChild(info);
-info = document.createElement("h2");
-info.innerHTML = `${group[GROUP_FIELD['description']]}`;
-basicInfo.appendChild(info);
 
-if(extended)
+add_information()
+if (admin) { // only admin can invite users
+  activate_invite_users()
+  activate_remove_users()
+}
+activate_join_leave_button()
+
+
+function activate_join_leave_button()
 {
+  if (extended)
+    activate_leave_button()
+  else
+  {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/check-requested', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({'id': user[0], 'group': group[0]}));
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4 && xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        if (response.message == true)
+          activate_request_button()
+        else 
+          activate_join_button()
+      }
+    };
+
+  }
+}
+
+function activate_leave_button()
+{
+  button = document.getElementById("join-leave-button");
+  button.style.background = "rgb(119, 34, 34)";
+  button.innerHTML = "Leave group";
+  button.style.color = "white";
+  button.onclick = function() { leave_group(button.id); };
+}
+
+function activate_join_button()
+{
+  console.log("What")
+  button = document.getElementById("join-leave-button");
+  button.style.background = "rgb(17, 136, 85)";
+  button.innerHTML = "Join Group";
+  button.style.color = "white";
+  button.onclick = function() { join_group(button.id); };
+}
+
+function activate_request_button()
+{
+  button = document.getElementById("join-leave-button");
+  button.style.background = "#349";
+  button.innerHTML = "Requested";
+  button.style.color = "white";
+}
+
+function leave_group()
+{
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/leave-group', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({'id': user[0], 'group': group[0]}));
+  activate_join_button()
+}
+
+function join_group()
+{
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/join-group', true);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify({'id': user[0], 'group': group[0]}));
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4 && xhr.status === 200) {
+      var response = JSON.parse(xhr.responseText);
+      console.log(response.message == "Requested")
+      console.log(response.message == "Joined")
+      if (response.message == "Requested")
+        activate_request_button()
+      if (response.message == "Joined")
+        activate_leave_button()
+        window.location.reload();
+    }
+  };
+}
+
+function add_information()
+{
+  const basicInfo = document.getElementById("basic-info");
+
+  const name_button_wrapper = document.createElement("div");
+  name_button_wrapper.id = "name-button-wrapper"
+  basicInfo.appendChild(name_button_wrapper);
+  
+  
+  let info = document.createElement("h1");
+  info.innerHTML = `${group[GROUP_FIELD['name']]}`;
+  name_button_wrapper.appendChild(info);
+  
+  const join_leave_button = document.createElement("button");
+  join_leave_button.id = "join-leave-button";
+  name_button_wrapper.appendChild(join_leave_button);
+  
   info = document.createElement("h2");
-  info.innerHTML = `${group[GROUP_FIELD['usersNum']]} members`;
+  info.innerHTML = `${group[GROUP_FIELD['description']]}`;
+  
   basicInfo.appendChild(info);
+  
+  if(extended)
+  {
+    info = document.createElement("h2");
+    info.innerHTML = `${group[GROUP_FIELD['usersNum']]} members`;
+    basicInfo.appendChild(info);
+  
+  }
 }
 
 function activate_invite_users()
@@ -194,9 +300,4 @@ function activate_remove_users()
         }
       });
   });
-}
-
-if (admin) { // only admin can invite users
-  activate_invite_users()
-  activate_remove_users()
 }

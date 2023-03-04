@@ -276,6 +276,31 @@ def main_page():
     return resp
 
 
+@app.route('/leave-group', methods=['POST'])
+def leave_group():
+    data = request.get_json() # Get data from JavaScript request
+    query.remove_users(None, data['group'], [data['id']])
+    query.remove_group_from_user(data['id'], data['group'])
+    return '', 204
+
+@app.route('/join-group', methods = ['POST'])
+def request_join_group():
+    data = request.get_json() # Get data from JavaScript request
+    result = query.handle_group_request(data['group'], data['id'])
+    response_data = {'message': result}
+    if result == "Accepted":
+        return jsonify(response_data), 200
+    return jsonify(response_data), 200
+
+@app.route('/check-requested', methods = ['POST'])
+def check_requested_status():
+    data = request.get_json() # Get data from JavaScript request
+    result = query.check_requested_status(data['group'], data['id'])
+    response_data = {'message': result}
+    if result == True:
+        return jsonify(response_data), 200
+    return jsonify(response_data), 200
+
 if __name__ == '__main__':
     logging.info("Server startup")
     assert query.init_db() == True

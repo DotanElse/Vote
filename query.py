@@ -636,6 +636,7 @@ def remove_users(admin_id, group_id, user_id_list):
     logging.info("start")
     group = get_group(group_id)
     group_users = str_to_list(group[GROUP_FIELD['users']])
+    group_user_amount = group[GROUP_FIELD['usersNum']]
     new_group_users = []
     for user in group_users:
         if user not in user_id_list:
@@ -643,7 +644,10 @@ def remove_users(admin_id, group_id, user_id_list):
     new_group_users = list_to_str(new_group_users)
     for user in user_id_list:
         remove_group_from_user(user, group_id)
+    
     update_field("groups", group_id, "users", new_group_users)
+    logging.info(f"JOJO {len(user_id_list)}")
+    update_field("groups", group_id, "usersNum", group_user_amount-len(user_id_list))
 
 def add_to_group(id, group_id):
     logging.info("start")
@@ -699,3 +703,43 @@ def setup_main_page(email):
 
     voted = get_voted(id, polls)
     return user, render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=get_detailed_notifications(id))
+
+def add_group_to_user(user_id, group_id):
+    user = get_user_by_id(user_id)
+    user_groups = user[USER_FIELD['groups']]
+    updated_user_groups = add_to_str(user_groups, group_id)
+    update_field("users", user_id, "groups", updated_user_groups)
+
+def handle_group_request(group_id, user_id):
+    group = get_group(group_id)
+    if group[GROUP_FIELD['public']] == "Public":
+        add_to_group(user_id, group_id)
+        add_group_to_user(user_id, group_id)
+        return "Added"
+    add_notification(group[GROUP_FIELD['creator']], "request", user_id, group_id)
+    return "Requested"
+    
+def check_requested_status(group_id, user_id):
+    group = get_group(group_id)
+    group_creator = group[GROUP_FIELD['creator']]
+    try:
+        notificationConn = sqlite3.connect('notifications.db')
+        with notificationConn:
+            c = notificationConn.cursor()
+            c.execute("SELECT * FROM notifications WHERE id = ? AND initiator = ? AND group_ = ?", (group_creator, user_id, group_id))
+            a = c.fetchall()
+            if a:
+                return True
+            return False
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+    
+    #invite-leave button control
+    # if a user is in the group, always show remove button
+    # if group is public, add the user to the group and group to user
+    # (if group is private) add notification to the admin with the user and group with "request" type
+    # 
+
+    
+    # if group is private, add a notification to the admin
