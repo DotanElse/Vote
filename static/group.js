@@ -64,7 +64,7 @@ function activate_join_button()
 {
   console.log("What")
   button = document.getElementById("join-leave-button");
-  button.style.background = "rgb(17, 136, 85)";
+  button.style.background = "olivedrab";
   button.innerHTML = "Join Group";
   button.style.color = "white";
   button.onclick = function() { join_group(button.id); };

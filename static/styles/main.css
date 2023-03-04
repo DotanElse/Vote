@@ -115,7 +115,7 @@ img {
 }
 .radar-form p {
   color: #666;
-  font-size: 24px;
+  font-size: 20px;
 }
 .radar-form .option {
   display: flex;
@@ -211,7 +211,7 @@ img {
   margin-right: 0px;
   padding: 3px 5px;
   border: none;
-  background: rgb(67, 94, 145);
+  background: #349;
   color: #fff;
   font-size: 16px;
   cursor: pointer;
@@ -227,7 +227,7 @@ img {
   padding: 3px;
   margin: 3px;
   border: none;
-  background: #185;
+  background: olivedrab;
   color: #fff;
   font-size: 16px;
   cursor: pointer;
@@ -240,7 +240,7 @@ img {
   padding: 3px;
   margin: 3px;
   border: none;
-  background: #922;
+  background: rgb(119, 34, 34);
   color: #fff;
   font-size: 16px;
   cursor: pointer;

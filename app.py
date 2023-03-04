@@ -89,7 +89,7 @@ def process_login_form():
     password = request.form['password']
 
     if not query.authorize_user(email, password):
-        return render_template("failed_login.html")
+        return render_template("error.html")
     
     user, template = query.setup_main_page(email)
 

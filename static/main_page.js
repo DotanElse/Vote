@@ -305,7 +305,7 @@ function filter_groups(id)
     for (var i = 0; i < all_group_buttons.length; i++) {
         all_group_buttons[i].style.border = "3px solid transparent";
     }
-    curr_button.style.border = "3px solid green";
+    curr_button.style.border = "3px solid olivedrab";
     for (var i in polls){
         const curr_poll_id = polls[i][POLL_FIELD['id']]
         const curr_poll_element = document.getElementById(curr_poll_id);
@@ -438,8 +438,7 @@ function notification_handler(user_id, group_id, initiator, category, choice, no
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.send(JSON.stringify({'initiator': initiator, 'group': group_id, 'choice': choice}));
     }
-
-    //window.location.reload();
+    window.location.reload();
 }
 
 function get_notification_element(notification)
