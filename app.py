@@ -246,7 +246,14 @@ def view_group(group_id):
 @app.route('/handle-invite-notification', methods=['POST'])
 def handle_invite_notification():
     data = request.get_json()  # Get data from JavaScript request
-    query.handle_notification(data['id'], data['group'], data['choice'])
+    query.handle_invite_notification(data['id'], data['group'], data['choice'])
+    return '', 204  # Return empty response with 204 status code
+
+@app.route('/handle-request-notification', methods=['POST'])
+def handle_request_notification():
+    data = request.get_json()  # Get data from JavaScript request
+    logging.info(f"initiator is {data['initiator']}")
+    query.handle_request_notification(data['initiator'], data['group'], data['choice'])
     return '', 204  # Return empty response with 204 status code
 
 @app.route('/search', methods=['POST'])

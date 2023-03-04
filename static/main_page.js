@@ -396,8 +396,10 @@ function create_notification_msg_element(notification)
     var combinedString = ""
     console.log(notification[NOTIFICATIONS_FIELD['category']])
     if(notification[NOTIFICATIONS_FIELD['category']] == "invitation")
-        combinedString = `${user_link.outerHTML} has invited you to join “${group_link.outerHTML}” group`;
+        combinedString = `${user_link.outerHTML} has invited you to join "${group_link.outerHTML}" group`;
     // Create a new h3 element
+    if(notification[NOTIFICATIONS_FIELD['category']] == "request")
+        combinedString = `${user_link.outerHTML} has requested to join "${group_link.outerHTML}" group`;
     const notification_msg_element = document.createElement('h3');
     notification_msg_element.style.margin = "0px";
     notification_msg_element.style.padding = "5px";
@@ -407,14 +409,26 @@ function create_notification_msg_element(notification)
 
 }
 
-function notification_handler(user_id, group_id, choice, notification_element)
+function notification_handler(user_id, group_id, initiator, category, choice, notification_element)
 {
     notification_element.remove()
+    console.log(initiator)
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/handle-invite-notification', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({'id': user_id, 'group': group_id, 'choice': choice}));
-    window.location.reload();
+    if (category == "invitation")
+    {
+        xhr.open('POST', '/handle-invite-notification', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'id': user_id, 'group': group_id, 'choice': choice}));
+    }
+
+    if (category == "request")
+    {
+        xhr.open('POST', '/handle-request-notification', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({'initiator': initiator, 'group': group_id, 'choice': choice}));
+    }
+
+    //window.location.reload();
 }
 
 function get_notification_element(notification)
@@ -428,12 +442,31 @@ function get_notification_element(notification)
     const accept_button = document.createElement("button");
     accept_button.innerHTML = "Accept"
     accept_button.className = "accept-button";
-    accept_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], true, notification_element); };
+    accept_button.onclick = function() 
+    {
+        notification_handler(notification[NOTIFICATIONS_FIELD['id']], 
+        notification[NOTIFICATIONS_FIELD['group']], 
+        notification[NOTIFICATIONS_FIELD['initiator']],
+        notification[NOTIFICATIONS_FIELD['category']], 
+        true, 
+        notification_element,
+        ); 
+    };
 
     const decline_button = document.createElement("button");
     decline_button.className = "decline-button";
     decline_button.innerHTML = "Decline"
-    decline_button.onclick = function() { notification_handler(notification[NOTIFICATIONS_FIELD['id']], notification[NOTIFICATIONS_FIELD['group']], false, notification_element); };
+    decline_button.onclick = function() 
+    { 
+        notification_handler(
+            notification[NOTIFICATIONS_FIELD['id']], 
+            notification[NOTIFICATIONS_FIELD['group']],
+            notification[NOTIFICATIONS_FIELD['initiator']],
+            notification[NOTIFICATIONS_FIELD['category']], 
+            false, 
+            notification_element,
+            ); 
+    };
 
     const notification_msg = create_notification_msg_element(notification);
 

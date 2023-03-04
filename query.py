@@ -660,6 +660,7 @@ def add_to_group(id, group_id):
     update_field("users", id, "groups", user_groups)
     update_field("groups", group_id, "usersNum", group[GROUP_FIELD['usersNum']]+1)
     update_field("groups", group_id, "users", group_users)
+    logging.info("all added")
     return True
 
 def remove_group_from_user(id, group_id):
@@ -670,10 +671,25 @@ def remove_group_from_user(id, group_id):
     update_field("users", id, "groups", user_groups)
     return True
 
-def handle_notification(id, group_id, choice):
+def handle_request_notification(initator, group_id, choice):
+    logging.info("start")
+    values = (initator, group_id)
+    logging.info(values)
+    query = "DELETE FROM notifications WHERE initiator=? AND group_=?"
+    try:
+        notificationsConn = sqlite3.connect('notifications.db')
+        with notificationsConn:
+            c = notificationsConn.cursor()
+            c.execute(query, values)
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return False
+    if choice:
+        add_to_group(initator, group_id)
+
+def handle_invite_notification(id, group_id, choice):
     # Remove all notifications of the specific user and group
     logging.info("start")
-    logging.info(f"{id, group_id, choice}")
     values = (id, group_id)
     query = "DELETE FROM notifications WHERE id=? AND group_=?"
     try:
