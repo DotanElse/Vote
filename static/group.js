@@ -27,10 +27,9 @@ basicInfo.appendChild(info);
 
 if(extended)
 {
-  const extendedInfo = document.getElementById("extended-info");
   info = document.createElement("h2");
-  info.innerHTML = `This group have ${group[GROUP_FIELD['usersNum']]} members`;
-  extendedInfo.appendChild(info);
+  info.innerHTML = `${group[GROUP_FIELD['usersNum']]} members`;
+  basicInfo.appendChild(info);
 }
 
 function activate_invite_users()
@@ -48,25 +47,31 @@ function activate_invite_users()
   submitButton.id = "submitButton";
 
   container.appendChild(searchInput);
-  container.appendChild(submitButton);
 
   const buttonsContainer = document.getElementById("buttonsContainer");
-  buttonsContainer.appendChild(container);
 
-  for (let user in users) {
+  inviteContainer = document.createElement("div");
+  inviteContainer.className = "invite-container";
+  buttonsContainer.appendChild(inviteContainer);
+
+  inviteContainer.appendChild(container);
+
+  for (let curr_user in users) {
     const button = document.createElement("button");
-    button.textContent = users[user];
+    button.textContent = users[curr_user];
     button.classList.add("button");
     button.addEventListener("click", function() {
-      this.classList.toggle("selected");
+      this.classList.toggle("invite-selected");
     });
-    button.dataset.id = user;
-    buttonsContainer.appendChild(button);
+    button.dataset.id = curr_user;
+    inviteContainer.appendChild(button);
   }
+  inviteContainer.appendChild(submitButton);
+
 
   searchInput.addEventListener("input", function() {
     const inputValue = this.value.toLowerCase();
-    const buttons = buttonsContainer.querySelectorAll(".button");
+    const buttons = inviteContainer.querySelectorAll(".button");
     for (const button of buttons) {
       const buttonText = button.textContent.toLowerCase();
       if (buttonText.includes(inputValue)) {
@@ -79,7 +84,7 @@ function activate_invite_users()
 
   submitButton.addEventListener("click", function() {
     // Get the list of selected buttons
-    const selectedButtons = document.querySelectorAll(".selected");
+    const selectedButtons = document.querySelectorAll(".invite-selected");
     const selectedIds = [];
     for (const button of selectedButtons) {
       selectedIds.push(button.dataset.id);
@@ -99,7 +104,7 @@ function activate_invite_users()
       .then(response => response.json())
       .then(data => {
         console.log(data.message);
-        const selectedButtons = document.querySelectorAll(".selected");
+        const selectedButtons = document.querySelectorAll(".invite-selected");
         for (const button of selectedButtons) {
           button.remove();
           window.location.reload();
@@ -123,25 +128,33 @@ function activate_remove_users()
   submitButton.id = "submitButton";
 
   container.appendChild(searchInput);
-  container.appendChild(submitButton);
 
   const buttonsContainer = document.getElementById("buttonsContainer");
-  buttonsContainer.appendChild(container);
+  removeContainer = document.createElement("div");
+  removeContainer.className = "remove-container";
+  buttonsContainer.appendChild(removeContainer);
 
-  for (let user in group_users) {
+  removeContainer.appendChild(container);
+
+  for (let curr_user in group_users) {
+    console.log(`curr user is ${group_users[curr_user]} and user entered is ${user[0]}`)
+    if (curr_user == user[0])
+      continue;
     const button = document.createElement("button");
-    button.textContent = group_users[user];
+    button.textContent = group_users[curr_user];
     button.classList.add("button");
     button.addEventListener("click", function() {
-      this.classList.toggle("selected");
+      this.classList.toggle("remove-selected");
     });
-    button.dataset.id = user;
-    buttonsContainer.appendChild(button);
+    button.dataset.id = curr_user;
+    removeContainer.appendChild(button);
   }
+
+  removeContainer.appendChild(submitButton);
 
   searchInput.addEventListener("input", function() {
     const inputValue = this.value.toLowerCase();
-    const buttons = buttonsContainer.querySelectorAll(".button");
+    const buttons = removeContainer.querySelectorAll(".button");
     for (const button of buttons) {
       const buttonText = button.textContent.toLowerCase();
       if (buttonText.includes(inputValue)) {
@@ -154,7 +167,7 @@ function activate_remove_users()
 
   submitButton.addEventListener("click", function() {
     // Get the list of selected buttons
-    const selectedButtons = document.querySelectorAll(".selected");
+    const selectedButtons = document.querySelectorAll(".remove-selected");
     const selectedIds = [];
     for (const button of selectedButtons) {
       selectedIds.push(button.dataset.id);
@@ -174,7 +187,7 @@ function activate_remove_users()
       .then(response => response.json())
       .then(data => {
         console.log(data.message);
-        const selectedButtons = document.querySelectorAll(".selected");
+        const selectedButtons = document.querySelectorAll(".remove-selected");
         for (const button of selectedButtons) {
           button.remove();
           window.location.reload();
