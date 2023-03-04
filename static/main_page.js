@@ -76,7 +76,13 @@ function poll_view(polls)
         var pollName = polls[i][3]
         const titleElement = document.createElement("h1");
         titleElement.textContent = pollName;
-        formElement.appendChild(titleElement);
+
+        var titleLink = document.createElement("a")
+        titleLink.href = `/poll/${poll_id}`;
+
+        titleLink.appendChild(titleElement);
+
+        formElement.appendChild(titleLink);
 
         const poll_description = polls[i][5];
         console.log(poll_description)
