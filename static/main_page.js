@@ -78,7 +78,7 @@ function poll_view(polls)
         titleElement.textContent = pollName;
 
         var titleLink = document.createElement("a")
-        titleLink.href = `/poll/${poll_id}`;
+        titleLink.href = `/vote/${poll_id}`;
 
         titleLink.appendChild(titleElement);
 

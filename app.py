@@ -210,7 +210,7 @@ def admin_group_removal(group_id):
     query.remove_users(user['id'], group_id, selected_ids)
     return jsonify({"message": f"id {user['id']} removed {selected_ids} from {group_id}"})
 
-@app.route('/poll/<poll_id>')
+@app.route('/vote/<poll_id>')
 def view_poll(poll_id):
     logging.info("start")
     try:
