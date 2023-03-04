@@ -1,11 +1,21 @@
   <head>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="../static/styles/intro.css">
-    <title>description title</title>
+    <link rel="stylesheet" href="../static/styles/index.css">
+    <title>Vote</title>
   </head>
   <body>
-    <h1>Vote</h1>
-    <a href="{{url_for('register')}}"><button id="register_button">Register</button>
-    <a href="{{url_for('login')}}"><button id="login_button">Login</button></a>
+    <a href="{{url_for('index')}}"><img src="./static/img/vote-icon.png" alt="return"></a>
+    <div class="container">
+      <div class="title_container">
+        <h1>Vote</h1>
+      </div> 
+      <div class="buttons-wrapper">
+        <a href="{{url_for('register')}}"><button id="register_button">Register</button></a>
+        <a href="{{url_for('login')}}"><button id="login_button">Login</button></a>
+      </div>
+      <div class="site-description">
+        <h3>Join groups and create votes to decide on just about anything</h3>
+      </div>
+    </div>
   </body>
 </html>

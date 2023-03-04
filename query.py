@@ -7,7 +7,7 @@ from utils import (
     get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
     USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD, NOTIFICATIONS_FIELD,
     str_to_list, list_to_str, add_to_str, remove_from_str,
-    check_password, remove_password_field, 
+    check_password, remove_password_field,
 )
 
 logging.basicConfig(level=logging.INFO, format='%(lineno)d:%(funcName)s:%(message)s')
@@ -521,6 +521,28 @@ def get_uninvited_users(group_id):
     uninvited_dict = {user[USER_FIELD['id']]: user[USER_FIELD['name']] for user in uninvited_users}
     return uninvited_dict
 
+def get_group_users(group_id):
+    # get all users
+    users = []
+    try:
+        usersConn = sqlite3.connect('users.db')
+        with usersConn:
+            c = usersConn.cursor()
+            c.execute("SELECT * FROM users")
+            users = c.fetchall()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+
+    # remove the users that are in the group or in the invite list
+    group_users = []
+    for user in users:
+        if user_in_group(user[USER_FIELD['id']], group_id):
+            group_users.append(user)
+    group_dict = {user[USER_FIELD['id']]: user[USER_FIELD['name']] for user in group_users}
+    logging.info(group_dict)
+    return group_dict
+
 def get_group_dict(groups_id):
     groups = {}
     for id in groups_id:
@@ -570,9 +592,9 @@ def group_view(group_id, user_id):
     userGroups = user[USER_FIELD['groups']]
     if group[GROUP_FIELD['id']] in userGroups: # user is part of this group
         if user[USER_FIELD['id']] in group[GROUP_FIELD['creator']]: # user is an admin
-            return render_template("group.html", group=group, user=remove_password_field(user), admin=True, extended=True, users=get_uninvited_users(group_id))
-        return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=True, users=None)
-    return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=False, users=None)
+            return render_template("group.html", group=group, user=remove_password_field(user), admin=True, extended=True, users=get_uninvited_users(group_id), group_users=get_group_users(group[GROUP_FIELD['id']]))
+        return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=True, users=None, group_users=get_group_users(group[GROUP_FIELD['id']]))
+    return render_template("group.html", group=group, user=remove_password_field(user), admin=False, extended=False, users=None, group_users=None)
 
 def user_in_group(user_id, group_id):
     user = get_user_by_id(user_id)
@@ -610,26 +632,64 @@ def invite_users(admin_id, group_id, user_id_list):
     group_invited = list_to_str(group_invited)
     update_field("groups", group_id, "invited", group_invited)
 
+def remove_users(admin_id, group_id, user_id_list):
+    logging.info("start")
+    group = get_group(group_id)
+    group_users = str_to_list(group[GROUP_FIELD['users']])
+    group_user_amount = group[GROUP_FIELD['usersNum']]
+    new_group_users = []
+    for user in group_users:
+        if user not in user_id_list:
+            new_group_users.append(user)
+    new_group_users = list_to_str(new_group_users)
+    for user in user_id_list:
+        remove_group_from_user(user, group_id)
+    
+    update_field("groups", group_id, "users", new_group_users)
+    logging.info(f"JOJO {len(user_id_list)}")
+    update_field("groups", group_id, "usersNum", group_user_amount-len(user_id_list))
+
 def add_to_group(id, group_id):
     logging.info("start")
     user = get_user_by_id(id)
     group = get_group(group_id)
-    logging.info("a")
     logging.info(type(user[USER_FIELD['groups']]))
     user_groups = add_to_str(user[USER_FIELD['groups']], group_id)
-    logging.info("b")
     group_users = add_to_str(group[GROUP_FIELD['users']], id)
 
     update_field("users", id, "groups", user_groups)
     update_field("groups", group_id, "usersNum", group[GROUP_FIELD['usersNum']]+1)
     update_field("groups", group_id, "users", group_users)
+    logging.info("all added")
     return True
 
+def remove_group_from_user(id, group_id):
+    logging.info("start")
+    user = get_user_by_id(id)
+    user_groups = remove_from_str(user[USER_FIELD['groups']], group_id)
 
-def handle_notification(id, group_id, choice):
+    update_field("users", id, "groups", user_groups)
+    return True
+
+def handle_request_notification(initator, group_id, choice):
+    logging.info("start")
+    values = (initator, group_id)
+    logging.info(values)
+    query = "DELETE FROM notifications WHERE initiator=? AND group_=?"
+    try:
+        notificationsConn = sqlite3.connect('notifications.db')
+        with notificationsConn:
+            c = notificationsConn.cursor()
+            c.execute(query, values)
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return False
+    if choice:
+        add_to_group(initator, group_id)
+
+def handle_invite_notification(id, group_id, choice):
     # Remove all notifications of the specific user and group
     logging.info("start")
-    logging.info(f"{id, group_id, choice}")
     values = (id, group_id)
     query = "DELETE FROM notifications WHERE id=? AND group_=?"
     try:
@@ -659,3 +719,43 @@ def setup_main_page(email):
 
     voted = get_voted(id, polls)
     return user, render_template('main_page.html', id=id, username=username, groups=groups_dict, polls=polls, voted=voted, notifications=get_detailed_notifications(id))
+
+def add_group_to_user(user_id, group_id):
+    user = get_user_by_id(user_id)
+    user_groups = user[USER_FIELD['groups']]
+    updated_user_groups = add_to_str(user_groups, group_id)
+    update_field("users", user_id, "groups", updated_user_groups)
+
+def handle_group_request(group_id, user_id):
+    group = get_group(group_id)
+    if group[GROUP_FIELD['public']] == "Public":
+        add_to_group(user_id, group_id)
+        add_group_to_user(user_id, group_id)
+        return "Added"
+    add_notification(group[GROUP_FIELD['creator']], "request", user_id, group_id)
+    return "Requested"
+    
+def check_requested_status(group_id, user_id):
+    group = get_group(group_id)
+    group_creator = group[GROUP_FIELD['creator']]
+    try:
+        notificationConn = sqlite3.connect('notifications.db')
+        with notificationConn:
+            c = notificationConn.cursor()
+            c.execute("SELECT * FROM notifications WHERE id = ? AND initiator = ? AND group_ = ?", (group_creator, user_id, group_id))
+            a = c.fetchall()
+            if a:
+                return True
+            return False
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+        return None
+    
+    #invite-leave button control
+    # if a user is in the group, always show remove button
+    # if group is public, add the user to the group and group to user
+    # (if group is private) add notification to the admin with the user and group with "request" type
+    # 
+
+    
+    # if group is private, add a notification to the admin

@@ -194,6 +194,22 @@ def admin_group_invite(group_id):
     return jsonify({"message": f"id {user['id']} invited {selected_ids} to {group_id}"})
 
 
+@jwt_required
+@app.route('/process_group_removal/<group_id>', methods=['POST'])
+def admin_group_removal(group_id):
+    logging.info("JOJOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+    data = json.loads(request.data)
+    selected_ids = data["ids"]
+    logging.info(f"sel ids are {selected_ids} with group {group_id}")
+    try:
+        verify_jwt_in_request()
+        user = get_jwt_identity()
+    except BaseException as e:
+        logging.warning(f"{e} raised")
+    
+    query.remove_users(user['id'], group_id, selected_ids)
+    return jsonify({"message": f"id {user['id']} removed {selected_ids} from {group_id}"})
+
 @app.route('/poll/<poll_id>')
 def view_poll(poll_id):
     logging.info("start")
@@ -230,7 +246,14 @@ def view_group(group_id):
 @app.route('/handle-invite-notification', methods=['POST'])
 def handle_invite_notification():
     data = request.get_json()  # Get data from JavaScript request
-    query.handle_notification(data['id'], data['group'], data['choice'])
+    query.handle_invite_notification(data['id'], data['group'], data['choice'])
+    return '', 204  # Return empty response with 204 status code
+
+@app.route('/handle-request-notification', methods=['POST'])
+def handle_request_notification():
+    data = request.get_json()  # Get data from JavaScript request
+    logging.info(f"initiator is {data['initiator']}")
+    query.handle_request_notification(data['initiator'], data['group'], data['choice'])
     return '', 204  # Return empty response with 204 status code
 
 @app.route('/search', methods=['POST'])
@@ -259,6 +282,31 @@ def main_page():
     resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
     return resp
 
+
+@app.route('/leave-group', methods=['POST'])
+def leave_group():
+    data = request.get_json() # Get data from JavaScript request
+    query.remove_users(None, data['group'], [data['id']])
+    query.remove_group_from_user(data['id'], data['group'])
+    return '', 204
+
+@app.route('/join-group', methods = ['POST'])
+def request_join_group():
+    data = request.get_json() # Get data from JavaScript request
+    result = query.handle_group_request(data['group'], data['id'])
+    response_data = {'message': result}
+    if result == "Accepted":
+        return jsonify(response_data), 200
+    return jsonify(response_data), 200
+
+@app.route('/check-requested', methods = ['POST'])
+def check_requested_status():
+    data = request.get_json() # Get data from JavaScript request
+    result = query.check_requested_status(data['group'], data['id'])
+    response_data = {'message': result}
+    if result == True:
+        return jsonify(response_data), 200
+    return jsonify(response_data), 200
 
 if __name__ == '__main__':
     logging.info("Server startup")

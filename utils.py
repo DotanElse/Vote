@@ -100,7 +100,6 @@ def get_random_perm_link():
     return "".join(random.choices(characters, k=_LINK_LEN))
     
 def str_to_list(input):
-    logging.info(input)
     # Split the input string on commas
     if not input:
         return []
@@ -109,7 +108,6 @@ def str_to_list(input):
     return [item.strip() for item in items]
 
 def list_to_str(input):
-    logging.info(input)
     return ', '.join(input)
 
 def encrypt(input : str):
