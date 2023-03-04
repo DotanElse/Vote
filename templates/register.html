@@ -1,12 +1,15 @@
   <head>
     <meta charset="utf-8">
     <title>Register - Vote</title>
+    <link rel="stylesheet" href="../static/styles/register.css">
   </head>
   <body>
-    <div class="title_container">
-      <h2>Vote - Registration</h2>
-    </div> 
-      <form id="registration-form" action="/process_user_register" enctype="multipart/form-data" method="post">
+    <a href="{{url_for('index')}}"><img src="./static/img/back-arrow.png" alt="return"></a>
+    <div class="container">
+      <div class="title_container">
+        <h1>Vote - Registration</h1>
+      </div>
+      <form id="registration-form" class="form_container" action="/process_user_register" enctype="multipart/form-data" method="post">
         <label for="name">Full Name:</label><br>
         <input type="text" id="name" name="name" required><br>
         <label for="email">Email:</label><br>
@@ -19,5 +22,6 @@
         <input type="file" name="picture" id="picture"><br><br>
         <input type="submit" value="Submit">
       </form>
+    </div>
   </body>
 </html>

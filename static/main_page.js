@@ -132,6 +132,10 @@ function poll_view(polls)
         const filler_div = document.createElement("div");
         filler_div.className = "filler-div";
 
+        const group_name_text = document.createElement("h5");
+        group_name_text.textContent = groups[polls[i][4]];
+        filler_div.appendChild(group_name_text);
+
         const vote_button = document.createElement("button");
         vote_button.setAttribute("id", `button_${poll_id}`);
         vote_button.className = "btn";
@@ -345,8 +349,8 @@ function show_groups()
         button.id = id;
         button.className = "group-button";
         button.onclick = function() { filter_groups(button.id); };
-
-        group_wrapper.appendChild(button);
+        if (button.id != "0")
+            group_wrapper.appendChild(button);
 
         const group_link_button = document.createElement("button");
         group_link_button.innerHTML = "..."
@@ -354,7 +358,8 @@ function show_groups()
         group_link_button.id = `link-${id}`
         group_link_button.onclick = function() { group_page_link(button.id); };
 
-        group_wrapper.appendChild(group_link_button);
+        if (button.id != "0")
+            group_wrapper.appendChild(group_link_button);
 
         select.appendChild(group_wrapper);
     }
