@@ -1,8 +1,7 @@
-import json
 import sqlite3
 import time
 import logging
-from flask import Flask, render_template
+from flask import render_template
 from utils import (
     get_random_poll_id, get_random_user_id, get_random_perm_link, get_random_group_id,
     USER_FIELD, POLL_FIELD, DISCUSSION_FIELD, GROUP_FIELD, NOTIFICATIONS_FIELD,
