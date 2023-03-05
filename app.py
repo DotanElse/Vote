@@ -20,6 +20,10 @@ app.config['JWT_COOKIE_CSRF_PROTECT'] = False
 
 jwt = JWTManager(app)
 
+@jwt.invalid_token_loader
+def invalid_token_callback(error):
+    logging.info(error)
+    return render_template('index.html')
 
 
 @app.route('/')
@@ -38,8 +42,10 @@ def login():
 @app.route('/create_poll')
 def create_poll():
     logging.info("start")
-
-    token = request.cookies.get('access_token_cookie')
+    try:
+        token = request.cookies.get('access_token_cookie')
+    except:
+        return render_template('index.html')
     verify_jwt_in_request()
     user = get_jwt_identity()
     groups_id = utils.str_to_list(user['groups'])
@@ -95,7 +101,7 @@ def process_login_form():
 
     accessToken = create_jwt_access_token(user)
     resp = make_response(template)
-    resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=3))
+    resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(minutes=1))
     return resp
     
 
