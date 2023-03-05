@@ -28,8 +28,9 @@ function single_poll_view(poll)
     titleElement.textContent = pollName;
     formElement.appendChild(titleElement);
 
-    const poll_description = poll[5]
+    const poll_description = poll[5];
     if (poll_description)
+        console.log(poll_description);
         var descriptionElement = document.createElement("p");
         descriptionElement.textContent = poll_description;
         formElement.appendChild(descriptionElement);

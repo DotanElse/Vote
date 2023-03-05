@@ -85,9 +85,9 @@ function poll_view(polls)
         formElement.appendChild(titleLink);
 
         const poll_description = polls[i][5];
-        console.log(poll_description)
         if (poll_description)
         {
+            console.log(poll_description)
             var descriptionElement = document.createElement("p");
             descriptionElement.textContent = poll_description;
             formElement.appendChild(descriptionElement);
