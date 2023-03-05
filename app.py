@@ -101,7 +101,7 @@ def process_login_form():
 
     accessToken = create_jwt_access_token(user)
     resp = make_response(template)
-    resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(minutes=1))
+    resp.set_cookie('access_token_cookie', value=accessToken, expires=datetime.utcnow() + timedelta(hours=12))
     return resp
     
 
