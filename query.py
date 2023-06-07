@@ -105,7 +105,7 @@ def submit_user(email, password, name, date, picture):
     id = get_random_user_id()
     if id_exists(id, "users"):
         logging.warning(f"existing user id submittion")
-        return submit_user(email, password, name, date)
+        return submit_user(email, password, name, date, picture)
     try:
         usersConn = sqlite3.connect('users.db')
         with usersConn:
