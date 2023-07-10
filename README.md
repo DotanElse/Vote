@@ -8,7 +8,7 @@ create and participate in polls on any topic imaginable.
 
 ## Usage
 
-Join the site at https://vote-x5om.onrender.com/
+Join the site at (http://dotanelse.pythonanywhere.com/)
 This is an MVP for the site while developing more features.
 
 ## Contribution
